@@ -79,9 +79,13 @@ func handle_connection(c net.Conn) {
 		fmt.Println("Failed to read file.")
 	}
 
-	_, err_file_write_to_client := c.Write(buf[0:n2])
+	n3, err_file_write_to_client := c.Write(buf[0:n2])
 	if err_file_write_to_client != nil {
 		log.Fatal(err_file_write_to_client)
+		fmt.Println("Failed to write file to client.")
+	}
+
+	if n3 == 0 {
 		fmt.Println("Failed to write file to client.")
 	}
 
