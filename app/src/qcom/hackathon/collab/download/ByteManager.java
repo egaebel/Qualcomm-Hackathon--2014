@@ -23,6 +23,10 @@ public class ByteManager implements ConnectionInfoListener {
 	private Client client;
 	private Activity activity;
 	
+	public ByteManager() {
+		//DO NOT USE, FOR TESTING
+	}
+	
 	public ByteManager(String ipAddress, int portNum, Activity activity) throws IOException {
 		
 		client = new Client(ipAddress, portNum);
@@ -101,6 +105,11 @@ public class ByteManager implements ConnectionInfoListener {
         }
 	}
 	
+	public ResponseCallback getCallback(String filename, int chunkNum, int chunkSize) throws IOException {
+	
+		return new ResponseCallback(filename, chunkNum, chunkSize);		
+	}
+	
 	public class ResponseCallback {
 		
 		/**
@@ -149,17 +158,31 @@ public class ByteManager implements ConnectionInfoListener {
 			writer = new ByteArrayOutputStream(1024);
 			byteOffset = -1;
 		}
+		
+		public ResponseCallback(String filename, int chunkNum, int chunkSize) throws IOException {
 
-		public void writeToByteBuffer(byte[] buffer, int bufferLen) {
+			this.chunkNum = chunkNum;
+			this.chunkSize = chunkSize;
+			chunkOffset = 0;
+			file = new File(filename);
+			writer = new ByteArrayOutputStream(1024);
+			byteOffset = -1;
+		}
+
+		void writeToByteBuffer(byte[] buffer, int bufferLen) {
 			
 			writer.write(buffer, (chunkNum * chunkSize) + chunkOffset, bufferLen);
 			chunkOffset += bufferLen;
 		}
 		
-		public void writeBufferToFriends(byte[] buffer, int bufferLen) {
+		public void writeBufferToFriends() {
 			
 			//wifiMan. TODO: write bytes to friendos
+			
 			int byteOffset = (chunkNum * chunkSize) + chunkOffset;
+			//use writer
+			//SendFileManager send = new SendFileManager(writer.toByteArray());
+			
 		}
 		
 		public void writeChunkToFile() throws IOException {

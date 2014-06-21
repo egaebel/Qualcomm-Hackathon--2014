@@ -52,13 +52,15 @@ public class Client {
 	public void demand(ResponseCallback callback, 
 						int groupId, 
 						int groupSize, 
-						long chunkSize, 
+						long chunkSize,
+						int chunkNum,
 						String filename) throws IOException {
 	
 		url = new URL("http://" + this.ipAddress + ":" + this.portNum
 						+ "/" + groupId 
 						+ "-" + groupSize 
-						+ "-" + chunkSize 
+						+ "-" + chunkSize
+						+ "-" + chunkNum
 						+ "-" + filename);
 		this.conn = (HttpURLConnection) url.openConnection();
 		
@@ -72,9 +74,9 @@ public class Client {
 		while ((bufferLen = in.read(buffer)) > 0) {
 			
 			callback.writeToByteBuffer(buffer, bufferLen);
-			callback.writeBufferToFriends(buffer, bufferLen);
 		}
 		
+		callback.writeBufferToFriends();
 		callback.writeChunkToFile();
 	}
 }
