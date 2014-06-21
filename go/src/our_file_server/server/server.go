@@ -41,7 +41,7 @@ func handle_connection(c net.Conn) {
 
 	n, err := c.Read(buf[0:])
 
-	_, _ := c.Write(buf[0:n])
+	_, err2 := c.Write(buf[0:n])
 
-	os.Stout.Write(buf)
+	os.Stdout.Write(buf)
 }
