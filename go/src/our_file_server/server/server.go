@@ -85,8 +85,13 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 	//loop until we've read equal to the chunksize or the end of the file
 	for total_read < demand.chunk_size && n != 0 {
 		n = 0
-		n, _ = file.ReadAt(themBytes, read_location + total_read)
+		n, err = file.ReadAt(themBytes, read_location + total_read)
+		total_read = total_read + int64(n)
+		fmt.Println("The number of bytes read from the file is %d",total_read)
 		w.Write(themBytes)
+		if err != nil {
+			break
+		}
 	}
 }
 
