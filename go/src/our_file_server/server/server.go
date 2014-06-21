@@ -23,6 +23,8 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Println("Why hello there, let me handle this!")
 
+	fmt.Println("Wtf is this Request..." + req.URL.String())
+
 	file, err := os.Open("dat_file")
 	if err != nil {
 		log.Fatal("Couldn't open file in HandleConnection", err)
