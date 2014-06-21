@@ -15,6 +15,9 @@ type Demand struct {
 	filename string
 }
 
+//Sets the maximum size of a buffer for a demand
+const BUFFER_LENGTH = 1024
+
 func main() {
 	// Listen on TCP port 80 on all interfaces.
 	l, err := net.Listen("tcp", ":8080")
@@ -46,8 +49,6 @@ func handle_connection(c net.Conn) {
 	//Ensures the connection
 	defer c.Close()
 
-	//Sets the maximum size of a buffer for a demand
-	const BUFFER_LENGTH = 1024
 	var buf [BUFFER_LENGTH]byte
 
 	n, err := c.Read(buf[0:])
@@ -56,15 +57,24 @@ func handle_connection(c net.Conn) {
         log.Fatal(err)
     }
 
+    //Echo whatever was written so the client knows its information was recieved
 	_, err2 := c.Write(buf[0:n])
 
 	if err2 != nil {
 		log.Fatal(err2)
 	}
 
+	//Print out the information for debugging purposes
 	os.Stdout.Write(buf[0:n])
+
+	test_file, _ := os.Open("/home/pi/files_for_hackathon/test")
+	n2, _ := test_file.Read(buf)
+	_, err3 := test_file.Write(buf[0:n2])
+
 }
 
+
+//Converts a C string stored in a []byte to a Go string
 func CToGoString(c []byte) string {
     n := -1
     for i, b := range c {
@@ -75,3 +85,5 @@ func CToGoString(c []byte) string {
     }
     return string(c[:n+1])
 }
+
+func parse_demand(d *Demand, buf []byte)
