@@ -81,7 +81,7 @@ public class ByteManager implements ConnectionInfoListener {
         if (p2pInfo.isGroupOwner) {
             Log.d(TAG, "Connected as group owner");
             try {
-                handler = new GroupOwnerSocketHandler(activity);
+                handler = new GroupOwnerSocketHandler();
                 handler.start();
             } catch (IOException e) {
                 Log.d(TAG,
@@ -90,7 +90,7 @@ public class ByteManager implements ConnectionInfoListener {
             }
         } else {
             Log.d(TAG, "Connected as peer");
-            handler = new ClientSocketHandler(activity, p2pInfo.groupOwnerAddress);
+            handler = new ClientSocketHandler(p2pInfo.groupOwnerAddress);
             handler.start();
         }
         

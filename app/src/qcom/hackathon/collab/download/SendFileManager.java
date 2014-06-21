@@ -38,6 +38,7 @@ public class SendFileManager {
             oStream = socket.getOutputStream();
                         
             try {
+            	oStream.write(bArrayToSend.length);
             	oStream.write(bArrayToSend);
             	Log.d(TAG,"send file Done");
             }catch(Exception e){
