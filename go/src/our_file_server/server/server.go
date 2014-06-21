@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"fmt"
 	"net/http"
+	"sync"
 )
 
 type Demand struct {
@@ -25,7 +26,7 @@ type Group struct {
 }
 
 var gr *Group
-var mut *Mutex
+var mut *sync.Mutex
 
 //Sets the maximum size of a buffer for a demand
 const BUFFER_LENGTH = 1024
@@ -72,7 +73,7 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 	
 	//Keep track of how much has been read
 	n := 1
-	total_read := 0
+	var total_read int64 = 0
 	themBytes := make([]byte, 1024)
 
 	//loop until we've read equal to the chunksize or the end of the file
@@ -87,7 +88,7 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	gr = new(Group)
-	mut = new(Mutex)
+	mut = new(sync.Mutex)
 
 	http.HandleFunc("/", HandleConnection)
 	err := http.ListenAndServe(":8080", nil)
