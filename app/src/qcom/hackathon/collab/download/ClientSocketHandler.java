@@ -1,5 +1,5 @@
 
-package com.example.android.wifidirect.discovery;
+package qcom.hackathon.collab.download;
 
 import android.os.Handler;
 import android.util.Log;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-
+/*
 public class ClientSocketHandler extends Thread {
 
     private static final String TAG = "ClientSocketHandler";
@@ -47,3 +47,4 @@ public class ClientSocketHandler extends Thread {
     }
 
 }
+*/

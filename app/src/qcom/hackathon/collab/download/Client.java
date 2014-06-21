@@ -1,4 +1,4 @@
-package com.example.android.wifidirect.discovery;
+package qcom.hackathon.collab.download;
 
 import java.io.IOException;
 import java.net.InetAddress;

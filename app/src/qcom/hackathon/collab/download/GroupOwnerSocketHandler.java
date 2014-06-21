@@ -1,5 +1,5 @@
 
-package com.example.android.wifidirect.discovery;
+package qcom.hackathon.collab.download;
 
 import android.os.Handler;
 import android.util.Log;
@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
  * The implementation of a ServerSocket handler. This is used by the wifi p2p
  * group owner.
  */
+/*
 public class GroupOwnerSocketHandler extends Thread {
 
     ServerSocket socket = null;
@@ -34,9 +35,7 @@ public class GroupOwnerSocketHandler extends Thread {
 
     }
 
-    /**
-     * A ThreadPool for client sockets.
-     */
+    //A ThreadPool for client sockets.
     private final ThreadPoolExecutor pool = new ThreadPoolExecutor(
             THREAD_COUNT, THREAD_COUNT, 10, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
@@ -65,3 +64,4 @@ public class GroupOwnerSocketHandler extends Thread {
     }
 
 }
+*/
