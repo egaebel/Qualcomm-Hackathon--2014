@@ -17,7 +17,7 @@ type Demand struct {
 
 func main() {
 	// Listen on TCP port 80 on all interfaces.
-	l, err := net.Listen("tcp", ":80")
+	l, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatal(err)
 	}
