@@ -72,5 +72,10 @@ public class Client {
 			
 			System.out.println(buffer);
 		}
+		
+		while (in.read(buffer) > 0) {
+			
+			System.out.println(buffer);
+		}
 	}
 }
