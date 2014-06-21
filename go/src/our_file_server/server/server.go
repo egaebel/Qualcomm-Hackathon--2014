@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"fmt"
+	"net/http"
 )
 
 type Demand struct {
@@ -25,8 +26,9 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("Couldn't open file in HandleConnection", err)
 	}
 
-	themBytes := make([]byte, BUFFER_LENGTH)
-	_, err := file.ReadAt(themBytes, 0)
+	themBytes := make([]byte, 1024)
+	_, err = file.ReadAt(themBytes, 0)
+
 	if err != nil {
 		log.Fatal("ReadAt failed in HandleConnection...")
 	}
@@ -135,4 +137,7 @@ func CToGoString(c []byte) string {
 func parse_demand(d *Demand, buf []byte) {
 
 }
+<<<<<<< HEAD
 */
+=======
+>>>>>>> 595d162fb19662c2f7007fa8ee376659f35b0509
