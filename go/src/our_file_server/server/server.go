@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"fmt"
 )
 
 type Demand struct {
