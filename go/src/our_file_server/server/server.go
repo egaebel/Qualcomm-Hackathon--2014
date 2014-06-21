@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"fmt"
+	"net/http"
 )
 
 type Demand struct {
@@ -26,7 +27,7 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 	}
 
 	themBytes := make([]byte, 1024)
-	_, err := file.ReadAt(themBytes, 0)
+	_, err = file.ReadAt(themBytes, 0)
 	if err != nil {
 		log.Fatal("ReadAt failed in HandleConnection...")
 	}
