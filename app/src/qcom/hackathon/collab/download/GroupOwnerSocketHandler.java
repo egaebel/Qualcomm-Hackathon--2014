@@ -29,7 +29,6 @@ public class GroupOwnerSocketHandler extends Thread {
     // TODO Get thread count from size of group.
     private final int THREAD_COUNT = 10;
     private Activity mAct;
-    private int commType;
     private static final String TAG = "GroupOwnerSocketHandler";
 
     public GroupOwnerSocketHandler(Activity mAct) throws IOException {
