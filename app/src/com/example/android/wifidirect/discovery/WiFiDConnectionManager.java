@@ -1,5 +1,6 @@
 package com.example.android.wifidirect.discovery;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.net.wifi.p2p.WifiP2pManager.DnsSdServiceResponseListener;
 import android.net.wifi.p2p.WifiP2pManager.DnsSdTxtRecordListener;
+import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 
 import com.example.android.wifidirect.discovery.WiFiDirectBroadcastReceiver;
@@ -70,6 +72,31 @@ public class WiFiDConnectionManager {
 	
 	public List<WiFiP2pService> getServiceList() {
 		return serviceList;
+	}
+	
+	
+    /**
+     * Registers a local service and then initiates a service discovery
+     */
+	
+	public void startRegistrationAndDiscovery() {
+	        Map<String, String> record = new HashMap<String, String>();
+	        record.put(TXTRECORD_PROP_AVAILABLE, "visible");
+
+	        WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(
+	                SERVICE_INSTANCE, SERVICE_REG_TYPE, record);
+	        manager.addLocalService(channel, service, new ActionListener() {
+
+	            @Override
+	            public void onSuccess() {
+	                Log.i(TAG, "Added Local Service");
+	            }
+
+	            @Override
+	            public void onFailure(int error) {
+	                Log.i(TAG, "Failed to add a service");
+	            }
+	        });
 	}
 	
 	
@@ -187,16 +214,31 @@ public class WiFiDConnectionManager {
             }
         });
     }
-	
-	/*
-	 * Sends out a hard coded string to confirm that all connected phones are using the app,
-	 * responds to all strings received with a standard response, and 
-	 * terminates all connections that do not respond correctly within 5 seconds.
-	 */
-	public int filterGroup() {
-		
-		
-		return 0;	
-	}
+    
+    public void resume(Activity uiActivity) {
+    	uiActivity.registerReceiver(receiver, intentFilter);
+    }
+    
+    public void pause(Activity uiActivity) {
+    	uiActivity.unregisterReceiver(receiver);
+    }
+    
+    
+    public void stop() {
+    	 if (manager != null && channel != null) {
+             manager.removeGroup(channel, new ActionListener() {
+
+                 @Override
+                 public void onFailure(int reasonCode) {
+                     Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
+                 }
+
+                 @Override
+                 public void onSuccess() {
+                 }
+
+             });
+         }
+    }
 	
 }
