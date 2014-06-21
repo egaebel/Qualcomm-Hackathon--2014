@@ -1,18 +1,20 @@
 package qcom.hackathon.collab.download;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
-import android.content.Context;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -22,11 +24,15 @@ public class ByteManager implements ConnectionInfoListener {
 	private WiFiDConnectionManager wifiDConnMan;
 	private Client client;
 	private Activity activity;
+	private int phase = 0; //phase: 0 -- trunk number ;  1 -- distribute
+	private int trunkNumRec= -1;
+	private static final int SERVER_PORT= 8000;
+	private static final int CLIENT_PORT= 8000;	
 	
 	public ByteManager(String ipAddress, int portNum, Activity activity) throws IOException {
 		
 		client = new Client(ipAddress, portNum);
-		wifiDConnMan = new WiFiDConnectionManager(activity.getApplicationContext(), activity);
+		wifiDConnMan = new WiFiDConnectionManager(activity.getApplicationContext(), activity, this);
 		this.activity = activity;
 	}
 	
@@ -39,6 +45,10 @@ public class ByteManager implements ConnectionInfoListener {
 		//pass the data to demand, and load the callback
 		//ResponseCallback callback = ResponseCallback();
 		//client.demand(callback, groupId, groupSize, chunkSize, filename);
+	}
+	
+	public int getTrunkNum(){
+		return this.trunkNumRec;
 	}
 	
 	public void stopWifiD() {
@@ -78,27 +88,29 @@ public class ByteManager implements ConnectionInfoListener {
          * client socket for every client. This is handled by {@code
          * GroupOwnerSocketHandler}
          */
-        if (p2pInfo.isGroupOwner) {
-            Log.d(TAG, "Connected as group owner");
-            try {
-                handler = new GroupOwnerSocketHandler(activity);
-                handler.start();
-            } catch (IOException e) {
-                Log.d(TAG,
-                        "Failed to create a server thread - " + e.getMessage());
-                return;
-            }
-        } else {
-            Log.d(TAG, "Connected as peer");
-            handler = new ClientSocketHandler(activity, p2pInfo.groupOwnerAddress);
-            handler.start();
-        }
-        
-        try {
-        	handler.join();
-        } catch (InterruptedException e) {
-        	
-        }
+		if (0 == phase){
+	        if (p2pInfo.isGroupOwner) {
+	            Log.d(TAG, "Connected as group owner");
+	            this.trunkNumRec=0;
+	            //Starting the task. 
+	            new SocketAsync().execute(SERVER_PORT);	            
+	        } else {
+	            Log.d(TAG, "Connected as peer");
+	            String hostAddr=p2pInfo.groupOwnerAddress.getHostAddress();	     
+	            try {
+					this.trunkNumRec=new ClientSocketAsync().execute((Object)hostAddr).get();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	            Toast.makeText(this.activity, "trunc number: "+this.trunkNumRec, Toast.LENGTH_LONG).show();
+//	            handler = new ClientSocketHandler(activity, p2pInfo.groupOwnerAddress);
+//	            handler.start();
+	        }
+	        
+		}
 	}
 	
 	public class ResponseCallback {
@@ -185,4 +197,46 @@ public class ByteManager implements ConnectionInfoListener {
 			this.byteOffset = byteOffset;
 		}
 	}
+	
+	
+	class SocketAsync extends AsyncTask<Integer, Void, Void> {
+		        @Override
+		        protected Void doInBackground(Integer... port) {
+		            try {
+		                ServerSocket socket = new ServerSocket(port[0]);
+		                for (int i =0 ; i< 1; i++){
+			                Socket connectSocket = socket.accept();
+			            	DisServer mServer = new DisServer(connectSocket);
+			            	mServer.sendTrunkNum(i+1); // group owner gets trunk 0
+		                }
+		        	
+		            } catch (IOException e) {
+		            	Log.d(TAG,
+		            			"Failed to create a server socket- " + e.getMessage());
+		            }
+		            return null;
+		        }
+		    }
+
+	class ClientSocketAsync extends AsyncTask<Object, Void, Integer> {
+        @Override
+        protected Integer doInBackground(Object... port) {
+            Socket clientSocket = new Socket();
+            int ret=-1;
+            try {
+				clientSocket.bind(null);
+	            clientSocket.connect(new InetSocketAddress((String)port[0],
+	            		SERVER_PORT), CLIENT_PORT);
+	            DisClient mClient = new DisClient(clientSocket);
+	            ret = mClient.recTrunkNum();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            return ret;
+        }
+    }
+	
 }
+
+

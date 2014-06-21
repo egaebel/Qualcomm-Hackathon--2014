@@ -51,7 +51,7 @@ public class MainActivity extends Activity implements TabListener {
 	static FragMent2 fram2;
 	static FragMent3 fram3;
 	private String TAG = "mainactivity";
-	
+	private ByteManager mByteMan;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -128,6 +128,7 @@ public class MainActivity extends Activity implements TabListener {
 				peerListName[i] = peerList.get(i).device.deviceName;
 			}
 			args.putStringArray("list", peerListName);
+			args.putInt("num", this.byteMan.getTrunkNum());
 			fram2.setArguments(args);
 			fragMentTra.addToBackStack(null);
 			fragMentTra = getFragmentManager().beginTransaction();

@@ -44,7 +44,7 @@ public class WiFiServiceDiscoveryActivity extends Activity implements
         ConnectionInfoListener {
 
 	private String TAG = "mainactivity";
-    WiFiDConnectionManager manager = new WiFiDConnectionManager(getApplicationContext(), this);
+    WiFiDConnectionManager manager = new WiFiDConnectionManager(getApplicationContext(), this, this);
 
     /** Called when the activity is first created. */
     @Override

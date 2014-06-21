@@ -54,7 +54,7 @@ public class WiFiDConnectionManager {
 	 * Makes manager object, calls initialize, makes intent filter, makes broadcast receiver
 	 * @return error code?
 	 */
-	public WiFiDConnectionManager(Context mainContext, Activity mainActivity) {
+	public WiFiDConnectionManager(Context mainContext, Activity mainActivity, ConnectionInfoListener listener) {
 		
 		manager = (WifiP2pManager) mainContext.getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(mainContext, Looper.getMainLooper(), null);
@@ -66,7 +66,7 @@ public class WiFiDConnectionManager {
         intentFilter
                 .addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-		receiver = new WiFiDirectBroadcastReceiver(manager, channel, mainActivity);
+		receiver = new WiFiDirectBroadcastReceiver(manager, channel, mainActivity, listener);
 		this.startRegistrationAndDiscovery();
 	}
 	
