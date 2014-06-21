@@ -56,6 +56,12 @@ public class Client {
 						int chunkNum,
 						String filename) throws IOException {
 	
+		//HARD CODED FOR THE MUTHA FUCKING WIN
+		groupId = 1;
+		groupSize = 3;
+		chunkSize = 158;
+		filename = "test";
+		
 		url = new URL("http://" + this.ipAddress + ":" + this.portNum
 						+ "/" + groupId 
 						+ "-" + groupSize 

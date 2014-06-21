@@ -182,7 +182,6 @@ public class ByteManager implements ConnectionInfoListener {
 			int byteOffset = (chunkNum * chunkSize) + chunkOffset;
 			//use writer
 			//SendFileManager send = new SendFileManager(writer.toByteArray());
-			
 		}
 		
 		public void writeChunkToFile() throws IOException {
