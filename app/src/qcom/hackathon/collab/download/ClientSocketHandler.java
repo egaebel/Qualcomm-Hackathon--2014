@@ -21,13 +21,11 @@ public class ClientSocketHandler extends Thread {
     private static final String TAG = "ClientSocketHandler";
     private InetAddress mAddress;
     private Socket socket;
+    private List<Socket> socketList;
 
-    public ClientSocketHandler(InetAddress groupOwnerAddress) {
+    public ClientSocketHandler(InetAddress groupOwnerAddress, List<Socket> socketList) {
         this.mAddress = groupOwnerAddress;
-    }
-    
-    public Socket getNonGOSocket() {
-    	return socket;
+        this.socketList = socketList;
     }
 
     @Override
@@ -37,6 +35,7 @@ public class ClientSocketHandler extends Thread {
             socket.bind(null);
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
                     WiFiDConnectionManager.SERVER_PORT), 5000);
+            socketList.add(0,socket);
             Log.d(TAG, "Launching the I/O handler");
         
         } catch (IOException e) {

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.List;
 
 import android.app.Activity;
@@ -23,11 +24,15 @@ public class ByteManager implements ConnectionInfoListener {
 	private Client client;
 	private Activity activity;
 	
+	public List<Socket> persistentSocketList;
+	
 	public ByteManager(String ipAddress, int portNum, Activity activity) throws IOException {
 		
 		client = new Client(ipAddress, portNum);
 		wifiDConnMan = new WiFiDConnectionManager(activity.getApplicationContext(), activity);
 		this.activity = activity;
+		
+		// Initialize Sockets
 	}
 	
 	public void kickstart() {
@@ -159,6 +164,7 @@ public class ByteManager implements ConnectionInfoListener {
 		public void writeBufferToFriends(byte[] buffer, int bufferLen) {
 			
 			//wifiMan. TODO: write bytes to friendos
+			
 			int byteOffset = (chunkNum * chunkSize) + chunkOffset;
 		}
 		

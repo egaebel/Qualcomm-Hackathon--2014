@@ -14,17 +14,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import java.util.List;
+
 /**
  * Handles reading and writing of messages with socket buffers. Uses a Handler
  * to post messages to UI thread for UI updates.
  */
 public class SendFileManager {
 
-    private Socket socket = null;
+    private List<Socket> socketList = null;
     private byte[] bArrayToSend;
 
-    public SendFileManager(Socket socket, byte[] bArray) {
-        this.socket = socket;
+    public SendFileManager(List<Socket> socketList, byte[] bArray) {
+        this.socketList = socketList;
         this.bArrayToSend = bArray;
     }
 
@@ -35,17 +37,19 @@ public class SendFileManager {
     public void sendFile() {
         try {
 
-            oStream = socket.getOutputStream();
+            for(int i = 0; i < socketList.size(); i++){
+            	oStream = socketList.get(i).getOutputStream();
+            
                         
-            try {
-            	oStream.write(bArrayToSend.length);
-            	oStream.write(bArrayToSend);
-            	Log.d(TAG,"send file Done");
-            }catch(Exception e){
-            	e.printStackTrace();
-            	Log.e(TAG, "Exception during write", e);
-            }
-
+            	try {
+            		oStream.write(bArrayToSend.length);
+            		oStream.write(bArrayToSend);
+            		Log.d(TAG,"send file Done");
+            	}catch(Exception e){
+            		e.printStackTrace();
+            		Log.e(TAG, "Exception during write", e);
+            	}
+            }    	
             
         }   catch (IOException e) {
         	e.printStackTrace();
