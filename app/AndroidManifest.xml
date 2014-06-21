@@ -4,6 +4,10 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
+    <instrumentation android:targetPackage="com.example.android.wifidirect.discovery"
+		android:name="android.test.InstrumentationTestRunner">
+	</instrumentation>
+    
     <uses-sdk android:minSdkVersion="16" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
