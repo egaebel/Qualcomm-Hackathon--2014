@@ -15,12 +15,12 @@ import android.util.Log;
  * 
  */
 public class Client {
-	
+
 	private static final String TAG = "CLIENT";
 	private String ipAddress;
 	private int portNum;
 	private SocketChannel sockChan;
-		
+
 	/**
 	 * Establish Server connection.
 	 * 
@@ -28,12 +28,12 @@ public class Client {
 	 * @throws IOException 
 	 */
 	public Client(String ipAddress, int portNum) throws IOException {
-		
+
 		this.ipAddress = ipAddress;
 		this.portNum = portNum;
 		sockChan = SocketChannel.open();
 	}
-	
+
 	/**
 	 * Send the following:
 	 * 	groupID
@@ -50,62 +50,63 @@ public class Client {
 	 * 
 	 * @throws IOException
 	 */
-	public boolean demand(String groupId, int groupSize, String filename, int chunkSize) throws IOException {
-		
+	public boolean demand(int groupId, int groupSize, int chunkSize, String filename) throws IOException {
+
 		//Abstractions to get SocketChannel to work
 		InetSocketAddress inetSockAddr = new InetSocketAddress(InetAddress.getByName(ipAddress), portNum);	
 		sockChan.connect(inetSockAddr);
-		
+
 		if (sockChan.isConnected()) {
 			Log.i(TAG, "Socket Channel Connected!!!!!");
 			//Send Request-----------------------------
 			//Create & Pack ByteBuffer
-			ByteBuffer sendBuf = ByteBuffer.allocate(1024);
-			for (int i = 0; i < groupId.length(); i++) {
-				
-				sendBuf.putChar(groupId.charAt(i));
-			}
+			int sendBufLength = 4 + 4 + 4 + 4 + filename.length();
+			ByteBuffer sendBuf = ByteBuffer.allocate(sendBufLength);
+			sendBuf.putInt(sendBufLength);
+			sendBuf.putInt(groupId);
 			sendBuf.putInt(groupSize);
+			sendBuf.putInt(chunkSize);
+
 			for (int j = 0; j < filename.length(); j++) {
-			
+
 				sendBuf.putChar(filename.charAt(j));
 			}
-			sendBuf.putInt(chunkSize);
-			
+
 			//Send
 			sockChan.write(sendBuf);
-			
+
 			//Await confirmation
 			ByteBuffer confirmBuf = ByteBuffer.allocate(1024);
-			while (sockChan.read(confirmBuf) != 0) {
-				
-				//receive confirmation
-				confirmBuf.equals(sendBuf);
-			}
-			
+			while (sockChan.read(confirmBuf) > 0);
+
 			//Validate confirmation
-			//if valid return true
-			
-			return true;
+			if (confirmBuf.equals(sendBuf)) {
+				
+				return true;
+			}
+			else {
+				
+				return false;
+			}
 		}
 		else {
-			
+
 			Log.i(TAG, "Socket Channel CONNECTION FAILED!!!!!");
 			//error
 			return false;
 		}
 	}
-	
+
 	public void download() {
-		
+
 		if (sockChan.isConnected()) {
-			
-			
+
+
 		}
 		else {
-			
-			
+
+
 		}
 	}
-	
+
 }
