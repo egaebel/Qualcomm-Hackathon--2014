@@ -11,16 +11,23 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.wifi.p2p.WifiP2pInfo;
+import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
+import android.util.Log;
+import android.widget.Toast;
 
-public class ByteManager {
+public class ByteManager implements ConnectionInfoListener {
 
+	private static final String TAG = "CONNECTION INFO LISTENER";
 	private WiFiDConnectionManager wifiDConnMan;
 	private Client client;
+	private Activity activity;
 	
 	public ByteManager(String ipAddress, int portNum, Activity activity) throws IOException {
 		
 		client = new Client(ipAddress, portNum);
-		wifiDConnMan = new WiFiDConnectionManager(activity.getApplicationContext(), activity); 
+		wifiDConnMan = new WiFiDConnectionManager(activity.getApplicationContext(), activity);
+		this.activity = activity;
 	}
 	
 	public void kickstart() {
@@ -54,6 +61,46 @@ public class ByteManager {
 		return wifiDConnMan.getServiceList();
 	}
 	
+	public void connectP2p(WiFiP2pService service) {
+		
+		wifiDConnMan.connectP2p(service);
+	}
+
+	/**
+	 * connectioninfolistener, called when a connection is established
+	 */
+	@Override
+	public void onConnectionInfoAvailable(WifiP2pInfo p2pInfo) {
+        Thread handler = null;
+		Toast.makeText(activity, "connection established", Toast.LENGTH_LONG).show();;        
+        /*
+         * The group owner accepts connections using a server socket and then spawns a
+         * client socket for every client. This is handled by {@code
+         * GroupOwnerSocketHandler}
+         */
+        if (p2pInfo.isGroupOwner) {
+            Log.d(TAG, "Connected as group owner");
+            try {
+                handler = new GroupOwnerSocketHandler(activity);
+                handler.start();
+            } catch (IOException e) {
+                Log.d(TAG,
+                        "Failed to create a server thread - " + e.getMessage());
+                return;
+            }
+        } else {
+            Log.d(TAG, "Connected as peer");
+            handler = new ClientSocketHandler(activity, p2pInfo.groupOwnerAddress);
+            handler.start();
+        }
+        
+        try {
+        	handler.join();
+        } catch (InterruptedException e) {
+        	
+        }
+	}
+	
 	public class ResponseCallback {
 		
 		/**
@@ -82,7 +129,6 @@ public class ByteManager {
 		 * The offset the chunk starts at from the beginning of the file in number of bytes
 		 */
 		private int byteOffset;
-		
 		
 		/**
 		 *  

@@ -40,7 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 @SuppressLint("NewApi")
-public class MainActivity extends Activity implements TabListener, ConnectionInfoListener {
+public class MainActivity extends Activity implements TabListener {
 	public static RelativeLayout rl;
 
 	//public WiFiDConnectionManager wifi_ctrl = null; 
@@ -160,6 +160,7 @@ public class MainActivity extends Activity implements TabListener, ConnectionInf
 			byteMan.connectP2p(eachDevice);
 			Log.d("connecting to device", eachDevice.device.deviceName);
 		}
+		
 /*		
 		try {
 			rl.removeAllViews();
@@ -178,43 +179,6 @@ public class MainActivity extends Activity implements TabListener, ConnectionInf
 		fragMentTra.add(rl.getId(), fram2);
 		fragMentTra.commit();
 */
-	}
-	
-	
-	
-	/**
-	 * connectioninfolistener, called when a connection is established
-	 */
-	@Override
-	public void onConnectionInfoAvailable(WifiP2pInfo p2pInfo) {
-        Thread handler = null;
-		Toast.makeText(getApplicationContext(), "connection established", Toast.LENGTH_LONG).show();;        
-        /*
-         * The group owner accepts connections using a server socket and then spawns a
-         * client socket for every client. This is handled by {@code
-         * GroupOwnerSocketHandler}
-         */
-        if (p2pInfo.isGroupOwner) {
-            Log.d(TAG, "Connected as group owner");
-            try {
-                handler = new GroupOwnerSocketHandler(this);
-                handler.start();
-            } catch (IOException e) {
-                Log.d(TAG,
-                        "Failed to create a server thread - " + e.getMessage());
-                return;
-            }
-        } else {
-            Log.d(TAG, "Connected as peer");
-            handler = new ClientSocketHandler(this,p2pInfo.groupOwnerAddress);
-            handler.start();
-        }
-        
-        try {
-        	handler.join();
-        } catch (InterruptedException e) {
-        	
-        }
 	}
 
     @Override
