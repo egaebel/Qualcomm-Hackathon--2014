@@ -99,7 +99,7 @@ public class WiFiServiceDiscoveryActivity extends Activity implements
         if (p2pInfo.isGroupOwner) {
             Log.d(TAG, "Connected as group owner");
             try {
-                handler = new GroupOwnerSocketHandler(this);
+                handler = new GroupOwnerSocketHandler();
                 handler.start();
             } catch (IOException e) {
                 Log.d(TAG,
@@ -108,7 +108,7 @@ public class WiFiServiceDiscoveryActivity extends Activity implements
             }
         } else {
             Log.d(TAG, "Connected as peer");
-            handler = new ClientSocketHandler(this,p2pInfo.groupOwnerAddress);
+            handler = new ClientSocketHandler(p2pInfo.groupOwnerAddress);
             handler.start();
         }
     }

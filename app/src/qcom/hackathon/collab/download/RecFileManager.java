@@ -17,13 +17,17 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * Handles reading and writing of messages with socket buffers. Uses a Handler
+ * Handles reading and writing of byte arrays through sockets. Uses a Handler
  * to post messages to UI thread for UI updates.
+ *
  */
-public class RecFileManager implements Runnable {
+public class RecFileManager {
 
     private Socket socket = null;
     private Activity mAct = null;
+    private byte[] size = new byte[4];
+    private byte[] bArray;
+    private byte[] buf = new byte[4096];
     
     public RecFileManager(Socket socket, Activity mAct) {
         this.socket = socket;
@@ -32,15 +36,22 @@ public class RecFileManager implements Runnable {
 
     private InputStream iStream;
 //    private OutputStream oStream;
-    private static final String TAG = "ChatHandler";
+    private static final String TAG = "RecFileManager";
 
-    @Override
-    public void run() {
+    
+    public byte[] getReceivedByteArray() {
+    	return bArray;
+    }
+
+    public void receiveFile() {
         try {
-        	//receive message from 
+        	//receive size of byte array
             iStream = socket.getInputStream();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buf = new byte[4096];
+            int sizeCheck = iStream.read(size,0,4);
+            if(sizeCheck != 4) {
+            	// TODO Throw error...or something
+            }
             int nextBytePlace=0;
             while(true) {
             	Log.d(TAG, "receiver kept receiving");
@@ -49,22 +60,16 @@ public class RecFileManager implements Runnable {
             	baos.write(buf,nextBytePlace,n);
             	nextBytePlace+=n;
             }
-            byte data[] = baos.toByteArray();
+            bArray = baos.toByteArray();
             
-            File sdCard = Environment.getExternalStorageDirectory();
-            File dir = new File (sdCard.getAbsolutePath());
-            dir.mkdirs();
-            final File file = new File(dir, "test");
-            FileOutputStream fos = new FileOutputStream(file);            
-            fos.write(data);
-            fos.close();            
+            /*
         	Log.d(TAG, "receiver finished receiving");
         	this.mAct.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                 	Toast.makeText(mAct, "received" + file.toString(), Toast.LENGTH_LONG).show();;
                 }
-            });
+            });*/
         }    
         catch (IOException e) {
         	e.printStackTrace();
@@ -73,12 +78,12 @@ public class RecFileManager implements Runnable {
         	e.printStackTrace();
         }
         finally {
-        	try {
-        		socket.close();
+        	try{ 
+        		iStream.close();
         	} catch (IOException e) {
         		e.printStackTrace();
         	}
-        }    
+        }
     }
 }            
 //            byte[] buffer = new byte[1024];

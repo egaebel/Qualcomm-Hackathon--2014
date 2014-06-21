@@ -5,6 +5,9 @@ import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
 
+import java.net.Socket;
+import java.util.List;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -14,39 +17,41 @@ import java.util.concurrent.TimeUnit;
 /**
  * The implementation of a ServerSocket handler. This is used by the wifi p2p
  * group owner.
+ * 
+ * The group owner always acts as a server when sockets are being initialized.
+ * The handler aggregates and exposes a list of sockets.
  */
 public class GroupOwnerSocketHandler extends Thread {
 
     ServerSocket socket = null;
+    private List<Socket> socketList;
+    
+    // TODO Get thread count from size of group.
     private final int THREAD_COUNT = 10;
-    private Activity mAct;
     private static final String TAG = "GroupOwnerSocketHandler";
 
-    public GroupOwnerSocketHandler(Activity mAct) throws IOException {
+    public GroupOwnerSocketHandler() throws IOException {
         try {
             socket = new ServerSocket(4545);
-            this.mAct=mAct;
             Log.d("GroupOwnerSocketHandler", "Socket Started");
         } catch (IOException e) {
             e.printStackTrace();
-            pool.shutdownNow();
             throw e;
         }
 
     }
-
-    /**
-     * A ThreadPool for client sockets.
-     */
-    private final ThreadPoolExecutor pool = new ThreadPoolExecutor(
-            THREAD_COUNT, THREAD_COUNT, 10, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>());
+    
+    public List<Socket> getGOSocketList() {
+    	return socketList;
+    }
 
     @Override
     public void run() {
             try {
-            	// instead of initiating a chat, we receive a file
-                pool.execute(new RecFileManager(socket.accept(), this.mAct));
+            	// initialize sockets with clients and put them in 
+                for(int i = 0; i < THREAD_COUNT; i++) {
+                	socketList.add(i, socket.accept());
+                }
                 Log.d(TAG, "Launching receiver side to receive files");
                 
             } catch (IOException e) {
@@ -57,7 +62,6 @@ public class GroupOwnerSocketHandler extends Thread {
 
                 }
                 e.printStackTrace();
-                pool.shutdownNow();
             }
         }
 }

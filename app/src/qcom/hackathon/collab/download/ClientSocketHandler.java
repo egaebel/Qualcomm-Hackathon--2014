@@ -9,31 +9,36 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.List;
+
+/*
+ * The non-group owners always act as clients in socket initialization.  
+ * The Handler exposes a socket that connects with the group owner.
+ */
 
 public class ClientSocketHandler extends Thread {
 
     private static final String TAG = "ClientSocketHandler";
-    private Activity mAct= null;
-//    private ChatManager chat;
     private InetAddress mAddress;
+    private Socket socket;
 
-    public ClientSocketHandler(Activity mAct, InetAddress groupOwnerAddress) {
-        this.mAct = mAct;
+    public ClientSocketHandler(InetAddress groupOwnerAddress) {
         this.mAddress = groupOwnerAddress;
+    }
+    
+    public Socket getNonGOSocket() {
+    	return socket;
     }
 
     @Override
     public void run() {
-        Socket socket = new Socket();
+        socket = new Socket();
         try {
             socket.bind(null);
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
                     WiFiDConnectionManager.SERVER_PORT), 5000);
             Log.d(TAG, "Launching the I/O handler");
-            SendFileManager snd = new SendFileManager(socket, this.mAct);
-            new Thread(snd).start();
-//            chat = new ChatManager(socket, handler);
-//            new Thread(chat).start();
+        
         } catch (IOException e) {
             e.printStackTrace();
             try {
