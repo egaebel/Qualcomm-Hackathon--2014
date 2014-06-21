@@ -17,10 +17,10 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * Handles reading and writing of messages with socket buffers. Uses a Handler
+ * Handles reading and writing of files with socket buffers. Uses a Handler
  * to post messages to UI thread for UI updates.
  */
-public class RecFileManager implements Runnable {
+public class RecFileManager {
 
     private Socket socket = null;
     private Activity mAct = null;
@@ -32,10 +32,10 @@ public class RecFileManager implements Runnable {
 
     private InputStream iStream;
 //    private OutputStream oStream;
-    private static final String TAG = "ChatHandler";
+    private static final String TAG = "RecFileManager";
 
-    @Override
-    public void run() {
+
+    public void receiveFile() {
         try {
         	//receive message from 
             iStream = socket.getInputStream();

@@ -14,15 +14,25 @@ import java.util.concurrent.TimeUnit;
 /**
  * The implementation of a ServerSocket handler. This is used by the wifi p2p
  * group owner.
+ * 
+ * The group owner always acts as a server when sockets are being initialized.
+ * The handler aggregates and exposes a list of sockets.
  */
 public class GroupOwnerSocketHandler extends Thread {
 
     ServerSocket socket = null;
     private final int THREAD_COUNT = 10;
     private Activity mAct;
+    private int commType;
     private static final String TAG = "GroupOwnerSocketHandler";
+    
+    private final int DISTRIBUTE = 4;
+    private final int DECISION = 1;
+    
+    private final int SEND = 0;
+    private final int RECEIVE = 1;
 
-    public GroupOwnerSocketHandler(Activity mAct) throws IOException {
+    public GroupOwnerSocketHandler(Activity mAct, int commType) throws IOException {
         try {
             socket = new ServerSocket(4545);
             this.mAct=mAct;

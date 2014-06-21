@@ -18,7 +18,7 @@ import java.net.Socket;
  * Handles reading and writing of messages with socket buffers. Uses a Handler
  * to post messages to UI thread for UI updates.
  */
-public class SendFileManager implements Runnable {
+public class SendFileManager {
 
     private Socket socket = null;
     private Activity mAct = null;
@@ -30,10 +30,10 @@ public class SendFileManager implements Runnable {
 
 //    private InputStream iStream;
     private OutputStream oStream;
-    private static final String TAG = "ChatHandler";
+    private static final String TAG = "SendFileManager";
 
-    @Override
-    public void run() {
+
+    public void sendFile() {
         try {
 //            iStream = socket.getInputStream();
             oStream = socket.getOutputStream();
