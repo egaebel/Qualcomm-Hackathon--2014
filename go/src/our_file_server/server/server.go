@@ -52,7 +52,15 @@ func handle_connection(c net.Conn) {
 
 	n, err := c.Read(buf[0:])
 
+	if err != nil {
+        log.Fatal(err)
+    }
+
 	_, err2 := c.Write(buf[0:n])
+
+	if err2 != nil {
+		log.Fatal(err2)
+	}
 
 	os.Stdout.Write(buf[0:n])
 }
