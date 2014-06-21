@@ -28,13 +28,11 @@ public class GroupOwnerSocketHandler extends Thread {
     
     // TODO Get thread count from size of group.
     private final int THREAD_COUNT = 10;
-    private Activity mAct;
     private static final String TAG = "GroupOwnerSocketHandler";
 
-    public GroupOwnerSocketHandler(Activity mAct) throws IOException {
+    public GroupOwnerSocketHandler() throws IOException {
         try {
             socket = new ServerSocket(4545);
-            this.mAct=mAct;
             Log.d("GroupOwnerSocketHandler", "Socket Started");
         } catch (IOException e) {
             e.printStackTrace();

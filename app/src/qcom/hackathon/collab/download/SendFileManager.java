@@ -21,51 +21,37 @@ import java.net.Socket;
 public class SendFileManager {
 
     private Socket socket = null;
-    private Activity mAct = null;
+    private byte[] bArrayToSend;
 
-    public SendFileManager(Socket socket, Activity mAct) {
+    public SendFileManager(Socket socket, byte[] bArray) {
         this.socket = socket;
-        this.mAct = mAct;
+        this.bArrayToSend = bArray;
     }
 
-//    private InputStream iStream;
     private OutputStream oStream;
     private static final String TAG = "SendFileManager";
 
 
     public void sendFile() {
         try {
-//            iStream = socket.getInputStream();
+
             oStream = socket.getOutputStream();
-            File dir = Environment.getExternalStorageDirectory();
-            final File file2send= new File(dir, "test");
-            
-            FileInputStream fileInputStream=null;            
-            byte[] bFile = new byte[(int) file2send.length()];
+                        
             try {
-                //convert file into array of bytes
-            	fileInputStream = new FileInputStream(file2send);
-            	fileInputStream.read(bFile);
-            	fileInputStream.close();
-            	write(bFile);
-            	System.out.println("send file Done");
+            	oStream.write(bArrayToSend);
+            	Log.d(TAG,"send file Done");
             }catch(Exception e){
             	e.printStackTrace();
+            	Log.e(TAG, "Exception during write", e);
             }
 
-        	this.mAct.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                	Toast.makeText(mAct, "send" + file2send.toString(), Toast.LENGTH_LONG).show();;
-                }
-            });
             
-        }    
-        catch (IOException e) {
+        }   catch (IOException e) {
         	e.printStackTrace();
+        	
         } finally {
         	try {
-        		socket.close();
+        		oStream.close();
         	} catch (IOException e) {
         		e.printStackTrace();
         	}
@@ -104,12 +90,6 @@ public class SendFileManager {
 //        }    
 //        }
 
-    public void write(byte[] buffer) {
-        try {
-            oStream.write(buffer);
-        } catch (IOException e) {
-            Log.e(TAG, "Exception during write", e);
-        }
-    }
+
 
 }

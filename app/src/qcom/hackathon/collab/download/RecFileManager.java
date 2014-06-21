@@ -76,7 +76,14 @@ public class RecFileManager {
         }
         catch (Exception e){
         	e.printStackTrace();
-        }   
+        }
+        finally {
+        	try{ 
+        		iStream.close();
+        	} catch (IOException e) {
+        		e.printStackTrace();
+        	}
+        }
     }
 }            
 //            byte[] buffer = new byte[1024];

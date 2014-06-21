@@ -19,12 +19,10 @@ import java.util.List;
 public class ClientSocketHandler extends Thread {
 
     private static final String TAG = "ClientSocketHandler";
-    private Activity mAct= null;
     private InetAddress mAddress;
     private Socket socket;
 
-    public ClientSocketHandler(Activity mAct, InetAddress groupOwnerAddress) {
-        this.mAct = mAct;
+    public ClientSocketHandler(InetAddress groupOwnerAddress) {
         this.mAddress = groupOwnerAddress;
     }
     
