@@ -25,7 +25,7 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("Couldn't open file in HandleConnection", err)
 	}
 
-	themBytes := make([]byte, 1024)
+	themBytes := make([]byte, BUFFER_LENGTH)
 	_, err := file.ReadAt(themBytes, 0)
 	if err != nil {
 		log.Fatal("ReadAt failed in HandleConnection...")
@@ -66,7 +66,7 @@ func main() {
 	}
 	*/
 }
-
+/*
 //Handles an incoming network connection
 //Currently echos data and writes to standard out
 //TO DO assign a chunk number and write back the chunk number,
@@ -135,3 +135,4 @@ func CToGoString(c []byte) string {
 func parse_demand(d *Demand, buf []byte) {
 
 }
+*/
