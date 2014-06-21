@@ -1,13 +1,12 @@
 package qcom.hackathon.collab.download;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-import android.util.Log;
+import qcom.hackathon.collab.download.ByteManager.ResponseCallback;
 
 /**
  * Handles communication with the server to request chunks,
@@ -15,12 +14,13 @@ import android.util.Log;
  * 
  */
 public class Client {
-
+	
 	private static final String TAG = "CLIENT";
 	private String ipAddress;
 	private int portNum;
-	private SocketChannel sockChan;
-
+	private HttpURLConnection conn;
+	private URL url;
+		
 	/**
 	 * Establish Server connection.
 	 * 
@@ -28,12 +28,11 @@ public class Client {
 	 * @throws IOException 
 	 */
 	public Client(String ipAddress, int portNum) throws IOException {
-
+		
 		this.ipAddress = ipAddress;
 		this.portNum = portNum;
-		sockChan = SocketChannel.open();
 	}
-
+	
 	/**
 	 * Send the following:
 	 * 	groupID
@@ -50,99 +49,28 @@ public class Client {
 	 * 
 	 * @throws IOException
 	 */
-	public boolean demand(int groupId, int groupSize, long chunkSize, String filename) {
-
-		//Abstractions to get SocketChannel to work
-		InetSocketAddress inetSockAddr = null;
+	public void demand(ResponseCallback callback, 
+						int groupId, 
+						int groupSize, 
+						long chunkSize, 
+						String filename) throws IOException {
+	
+		url = new URL("http://" + this.ipAddress + ":" + this.portNum
+						+ "/" + groupId 
+						+ "-" + groupSize 
+						+ "-" + chunkSize 
+						+ "-" + filename);
+		this.conn = (HttpURLConnection) url.openConnection();
 		
-		try {
-			inetSockAddr = new InetSocketAddress(InetAddress.getByName(ipAddress), portNum);
-		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			System.out.println("get by name failed...unknown host exception");
-		}	
+		conn.setDoInput(true);
+		conn.connect();
 		
-		try {
-			sockChan.connect(inetSockAddr);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.out.println("IO EXCEPTION ON CONNECT!");
-		}
+		InputStream in = new BufferedInputStream(conn.getInputStream());
 
-		if (sockChan.isConnected()) {
+		byte[] buffer = new byte[1024];
+		while (in.read(buffer) > 0) {
 			
-			System.out.println("Socket Channel Connected!!!!!");
-			//Send Request-----------------------------
-			//Create & Pack ByteBuffer
-			int sendBufLength = 4 + 4 + 4 + 8 + (filename.length() * 2);
-			ByteBuffer sendBuf = ByteBuffer.allocate(sendBufLength);
-			sendBuf.putInt(sendBufLength);
-			sendBuf.putInt(groupId);
-			sendBuf.putInt(groupSize);
-			sendBuf.putLong(chunkSize);
-			for (int j = 0; j < filename.length(); j++) {
-
-				sendBuf.putChar(filename.charAt(j));
-			}
-			
-			System.out.println("Byte buffer packed!");
-			
-			//Send
-			try {
-				sockChan.write(sendBuf);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("Sockchannel write IO exception!");
-			}
-			System.out.println("sockCHan write completed!");
-			//Await confirmation
-			ByteBuffer confirmBuf = ByteBuffer.allocate(1024);
-			try {
-				while (sockChan.read(confirmBuf) > 0);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("sockChan read, IO EXCEPTION!");
-			}
-			
-			System.out.println("Sockchan read completed!");
-			
-			for (int k = 0; k < confirmBuf.limit(); k++) {
-				
-				System.out.print(confirmBuf.get(k));
-			}
-			//Validate confirmation
-			if (confirmBuf.equals(sendBuf)) {
-				
-				return true;
-			}
-			else {
-				
-				return false;
-			}
-		}
-		else {
-
-			System.out.println("Socket Channel CONNECTION FAILED!!!!!");
-			
-			//error
-			return false;
+			System.out.println(buffer);
 		}
 	}
-
-	public void download() {
-
-		if (sockChan.isConnected()) {
-
-			
-		}
-		else {
-
-
-		}
-	}
-
 }

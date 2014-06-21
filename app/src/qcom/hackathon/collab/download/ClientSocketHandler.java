@@ -1,6 +1,7 @@
 
 package qcom.hackathon.collab.download;
 
+import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
 
@@ -8,16 +9,16 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-/*
+
 public class ClientSocketHandler extends Thread {
 
     private static final String TAG = "ClientSocketHandler";
-    private Handler handler;
-    private ChatManager chat;
+    private Activity mAct= null;
+//    private ChatManager chat;
     private InetAddress mAddress;
 
-    public ClientSocketHandler(Handler handler, InetAddress groupOwnerAddress) {
-        this.handler = handler;
+    public ClientSocketHandler(Activity mAct, InetAddress groupOwnerAddress) {
+        this.mAct = mAct;
         this.mAddress = groupOwnerAddress;
     }
 
@@ -27,10 +28,12 @@ public class ClientSocketHandler extends Thread {
         try {
             socket.bind(null);
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
-                    WiFiServiceDiscoveryActivity.SERVER_PORT), 5000);
+                    WiFiDConnectionManager.SERVER_PORT), 5000);
             Log.d(TAG, "Launching the I/O handler");
-            chat = new ChatManager(socket, handler);
-            new Thread(chat).start();
+            SendFileManager snd = new SendFileManager(socket, this.mAct);
+            new Thread(snd).start();
+//            chat = new ChatManager(socket, handler);
+//            new Thread(chat).start();
         } catch (IOException e) {
             e.printStackTrace();
             try {
@@ -42,9 +45,4 @@ public class ClientSocketHandler extends Thread {
         }
     }
 
-    public ChatManager getChat() {
-        return chat;
-    }
-
 }
-*/
