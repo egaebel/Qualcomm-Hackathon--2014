@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"io"
 	"log"
 	"net"
 	"fmt"
@@ -17,7 +16,7 @@ type Demand struct {
 }
 
 func main() {
-	// Listen on TCP port 2000 on all interfaces.
+	// Listen on TCP port 80 on all interfaces.
 	l, err := net.Listen("tcp", ":80")
 	if err != nil {
 		log.Fatal(err)
