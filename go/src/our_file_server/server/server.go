@@ -69,7 +69,7 @@ func handle_connection(c net.Conn) {
 
 	test_file, _ := os.Open("/home/pi/files_for_hackathon/test")
 	n2, _ := test_file.Read(buf[0:])
-	_, err3 := test_file.Write(buf[0:n2])
+	test_file.Write(buf[0:n2])
 
 }
 
@@ -86,4 +86,6 @@ func CToGoString(c []byte) string {
     return string(c[:n+1])
 }
 
-func parse_demand(d *Demand, buf []byte)
+func parse_demand(d *Demand, buf []byte) {
+
+}
