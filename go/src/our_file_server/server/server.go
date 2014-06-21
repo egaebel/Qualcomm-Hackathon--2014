@@ -67,9 +67,25 @@ func handle_connection(c net.Conn) {
 	//Print out the information for debugging purposes
 	os.Stdout.Write(buf[0:n])
 
-	test_file, _ := os.Open("/home/pi/files_for_hackathon/test")
-	n2, _ := test_file.Read(buf[0:])
-	test_file.Write(buf[0:n2])
+	test_file, err_open := os.Open("/home/pi/files_for_hackathon/test")
+	if err_open != nil {
+		log.Fatal(err_open)
+		fmt.Println("Failed to open file.")
+	}
+	
+	n2, err_file_read := test_file.Read(buf[0:])
+	if err_file_read != nil {
+		log.Fatal(err_file_read)
+		fmt.Println("Failed to read file.")
+	}
+
+	_, err_file_write_to_client := test_file.Write(buf[0:n2])
+	if err_file_write_to_client != nil {
+		log.Fatal(err_file_write_to_client)
+		fmt.Println("Failed to write file to client.")
+	}
+
+	os.Stdout.Write(buf[0:n2])
 
 }
 
