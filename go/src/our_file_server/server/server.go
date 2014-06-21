@@ -68,7 +68,7 @@ func handle_connection(c net.Conn) {
 	os.Stdout.Write(buf[0:n])
 
 	test_file, _ := os.Open("/home/pi/files_for_hackathon/test")
-	n2, _ := test_file.Read(buf)
+	n2, _ := test_file.Read(buf[0:])
 	_, err3 := test_file.Write(buf[0:n2])
 
 }
