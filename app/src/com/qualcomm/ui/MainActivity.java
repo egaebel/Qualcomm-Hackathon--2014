@@ -39,6 +39,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.Socket;
+
 @SuppressLint("NewApi")
 public class MainActivity extends Activity implements TabListener {
 	public static RelativeLayout rl;
@@ -51,7 +53,6 @@ public class MainActivity extends Activity implements TabListener {
 	static FragMent2 fram2;
 	static FragMent3 fram3;
 	private String TAG = "mainactivity";
-	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -128,6 +129,7 @@ public class MainActivity extends Activity implements TabListener {
 				peerListName[i] = peerList.get(i).device.deviceName;
 			}
 			args.putStringArray("list", peerListName);
+			args.putInt("num", this.byteMan.getTrunkNum());
 			fram2.setArguments(args);
 			fragMentTra.addToBackStack(null);
 			fragMentTra = getFragmentManager().beginTransaction();
@@ -158,6 +160,7 @@ public class MainActivity extends Activity implements TabListener {
 		this.getActionBar().setSelectedNavigationItem(1);
 		for (WiFiP2pService eachDevice:peerList){
 			byteMan.connectP2p(eachDevice);
+			
 			Log.d("connecting to device", eachDevice.device.deviceName);
 		}
 		

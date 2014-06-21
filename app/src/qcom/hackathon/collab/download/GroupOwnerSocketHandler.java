@@ -1,4 +1,3 @@
-
 package qcom.hackathon.collab.download;
 
 import android.app.Activity;
@@ -30,19 +29,16 @@ public class GroupOwnerSocketHandler extends Thread {
     private final int THREAD_COUNT = 10;
     private static final String TAG = "GroupOwnerSocketHandler";
 
-    public GroupOwnerSocketHandler() throws IOException {
+    public GroupOwnerSocketHandler(List<Socket> socketList) throws IOException {
         try {
-            socket = new ServerSocket(4545);
+            this.socket = new ServerSocket(4545);
+            this.socketList = socketList;
             Log.d("GroupOwnerSocketHandler", "Socket Started");
         } catch (IOException e) {
             e.printStackTrace();
             throw e;
         }
 
-    }
-    
-    public List<Socket> getGOSocketList() {
-    	return socketList;
     }
 
     @Override

@@ -16,6 +16,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Handles reading and writing of byte arrays through sockets. Uses a Handler
  * to post messages to UI thread for UI updates.
@@ -28,9 +31,11 @@ public class RecFileManager {
     private byte[] size = new byte[4];
     private byte[] bArray;
     private byte[] buf = new byte[4096];
+    private List<Socket> socketList;
+    List<byte[]> byteListArray = new ArrayList<byte[]>();
     
-    public RecFileManager(Socket socket, Activity mAct) {
-        this.socket = socket;
+    public RecFileManager(List<Socket> socketList, Activity mAct) {
+        this.socketList = socketList;
         this.mAct = mAct;
     }
 
@@ -39,29 +44,32 @@ public class RecFileManager {
     private static final String TAG = "RecFileManager";
 
     
-    public byte[] getReceivedByteArray() {
-    	return bArray;
+    public List<byte[]> getReceivedByteArray() {
+    	return byteListArray;
     }
 
     public void receiveFile() {
         try {
-        	//receive size of byte array
-            iStream = socket.getInputStream();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int sizeCheck = iStream.read(size,0,4);
-            if(sizeCheck != 4) {
-            	// TODO Throw error...or something
-            }
-            int nextBytePlace=0;
-            while(true) {
-            	Log.d(TAG, "receiver kept receiving");
-            	int n = iStream.read(buf);
-            	if( n < 0 ) break;
-            	baos.write(buf,nextBytePlace,n);
-            	nextBytePlace+=n;
-            }
-            bArray = baos.toByteArray();
-            
+        	for(int i = 0; i < socketList.size(); i++) {
+	        		
+	        	//receive size of byte array
+	            iStream = socket.getInputStream();
+	            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	            int sizeCheck = iStream.read(size,0,4);
+	            if(sizeCheck != 4) {
+	            	// TODO Throw error...or something
+	            }
+	            int nextBytePlace=0;
+	            while(true) {
+	            	Log.d(TAG, "receiver kept receiving");
+	            	int n = iStream.read(buf);
+	            	if( n < 0 ) break;
+	            	baos.write(buf,nextBytePlace,n);
+	            	nextBytePlace+=n;
+	            }
+	            bArray = baos.toByteArray();
+	            byteListArray.add(bArray);
+        	}
             /*
         	Log.d(TAG, "receiver finished receiving");
         	this.mAct.runOnUiThread(new Runnable() {

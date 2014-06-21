@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,55 +16,51 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import java.util.List;
-
 /**
  * Handles reading and writing of messages with socket buffers. Uses a Handler
  * to post messages to UI thread for UI updates.
  */
-public class SendFileManager {
+public class DisServer {
 
-    private List<Socket> socketList = null;
-    private byte[] bArrayToSend;
+    private Socket socket = null;
+//    private byte[] bArrayToSend;
 
-    public SendFileManager(List<Socket> socketList, byte[] bArray) {
-        this.socketList = socketList;
-        this.bArrayToSend = bArray;
+    public DisServer(Socket socket) {
+        this.socket = socket;
+//        this.bArrayToSend = bArray;
     }
 
     private OutputStream oStream;
+    private DataOutputStream dataOutStream;    
     private static final String TAG = "SendFileManager";
 
 
-    public void sendFile() {
+    public void sendTrunkNum(int val) {
         try {
-
-            for(int i = 0; i < socketList.size(); i++){
-            	oStream = socketList.get(i).getOutputStream();
-            
-                        
-            	try {
-            		oStream.write(bArrayToSend.length);
-            		oStream.write(bArrayToSend);
-            		Log.d(TAG,"send file Done");
-            	}catch(Exception e){
-            		e.printStackTrace();
-            		Log.e(TAG, "Exception during write", e);
-            	}
-            }    	
-            
-        }   catch (IOException e) {
+            oStream = socket.getOutputStream();
+            dataOutStream = new DataOutputStream(oStream);
+            dataOutStream.writeInt(val);
+        	Log.d(TAG, "server distribute trunkNum: " + val);            
+        }    
+        catch (IOException e) {
         	e.printStackTrace();
-        	
-        } finally {
-        	try {
+        }
+        catch (Exception e){
+        	e.printStackTrace();
+        }
+        finally {
+        	try{ 
         		oStream.close();
+        		dataOutStream.close();
         	} catch (IOException e) {
         		e.printStackTrace();
         	}
-        }    
+        }
     }
-            
+    	
+    	
+    	
+
 //            byte[] buffer = new byte[1024];
 //            int bytes;
 //            handler.obtainMessage(WiFiServiceDiscoveryActivity.MY_HANDLE, this)

@@ -7,62 +7,77 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import java.util.List;
-
 /**
- * Handles reading and writing of messages with socket buffers. Uses a Handler
+ * Handles reading and writing of byte arrays through sockets. Uses a Handler
  * to post messages to UI thread for UI updates.
+ *
  */
-public class SendFileManager {
+public class DisClient {
 
-    private List<Socket> socketList = null;
-    private byte[] bArrayToSend;
-
-    public SendFileManager(List<Socket> socketList, byte[] bArray) {
-        this.socketList = socketList;
-        this.bArrayToSend = bArray;
+    private Socket socket = null;
+    private Activity mAct = null;
+//    private byte[] size = new byte[4];
+    private byte[] bArray;
+//    private byte[] buf = new byte[4096];
+    
+    public DisClient(Socket socket) {
+        this.socket = socket;
+//        this.mAct = mAct;
     }
 
-    private OutputStream oStream;
-    private static final String TAG = "SendFileManager";
+    private InputStream iStream;
+    private DataInputStream dataStream;
+//    private OutputStream oStream;
+    private static final String TAG = "RecFileManager";
 
+    
+    public byte[] getReceivedByteArray() {
+    	return bArray;
+    }
 
-    public void sendFile() {
+    public int recTrunkNum() {
+    	int trunkNum=-1;
         try {
-
-            for(int i = 0; i < socketList.size(); i++){
-            	oStream = socketList.get(i).getOutputStream();
-            
-                        
-            	try {
-            		oStream.write(bArrayToSend.length);
-            		oStream.write(bArrayToSend);
-            		Log.d(TAG,"send file Done");
-            	}catch(Exception e){
-            		e.printStackTrace();
-            		Log.e(TAG, "Exception during write", e);
-            	}
-            }    	
-            
-        }   catch (IOException e) {
+        	//receive size of byte array
+            iStream = socket.getInputStream();
+            dataStream = new DataInputStream(iStream);
+            trunkNum = dataStream.readInt();
+            final int trunkNumDis = trunkNum;
+        	Log.d(TAG, "trunkNum " + trunkNum);            
+        	this.mAct.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                	Toast.makeText(mAct, "trunkNum: "+trunkNumDis, Toast.LENGTH_LONG).show();;
+                }
+            });
+        }    
+        catch (IOException e) {
         	e.printStackTrace();
-        	
-        } finally {
-        	try {
-        		oStream.close();
+        }
+        catch (Exception e){
+        	e.printStackTrace();
+        }
+        finally {
+        	try{ 
+        		iStream.close();
+        		dataStream.close();
         	} catch (IOException e) {
         		e.printStackTrace();
         	}
-        }    
+        }
+        return trunkNum;
     }
-            
+}            
 //            byte[] buffer = new byte[1024];
 //            int bytes;
 //            handler.obtainMessage(WiFiServiceDiscoveryActivity.MY_HANDLE, this)
@@ -96,5 +111,3 @@ public class SendFileManager {
 //        }
 
 
-
-}

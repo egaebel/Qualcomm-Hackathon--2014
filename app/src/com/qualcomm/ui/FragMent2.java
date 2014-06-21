@@ -46,6 +46,13 @@ public class FragMent2 extends Fragment {
 	     Button downloadButton = new Button(getActivity());
 	     downloadButton.setText("START DOWNLOAD");
 	     linearLayout.addView(downloadButton, lp);
+	     
+	     //add text 
+	     TextView truncNum= new TextView(getActivity());
+	     truncNum.setText("trunc number: " + myBundle.getInt("num"));
+	     linearLayout.addView(truncNum, lp);
+	     
+	     
          return rootView;		
 	}
 
