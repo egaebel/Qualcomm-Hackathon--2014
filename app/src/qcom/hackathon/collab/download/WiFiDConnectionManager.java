@@ -32,7 +32,7 @@ public class WiFiDConnectionManager {
 	public WifiP2pManager manager;
 	public Channel channel;
 	public BroadcastReceiver receiver;
-	public IntentFilter intentFilter;
+    public final IntentFilter intentFilter = new IntentFilter();
 	private WifiP2pDnsSdServiceRequest serviceRequest;
 	
 	public static final String TAG = "WiFiDConnectionManager";
@@ -67,6 +67,7 @@ public class WiFiDConnectionManager {
                 .addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
 		receiver = new WiFiDirectBroadcastReceiver(manager, channel, mainActivity);
+		this.startRegistrationAndDiscovery();
 	}
 	
 	public List<WiFiP2pService> getServiceList() {
@@ -96,6 +97,7 @@ public class WiFiDConnectionManager {
 	                Log.i(TAG, "Failed to add a service");
 	            }
 	        });
+	        discoverService();
 	}
 	
 	
