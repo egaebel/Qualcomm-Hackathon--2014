@@ -69,7 +69,20 @@ public class RecFileManager {
 	            }
 	            bArray = baos.toByteArray();
 	            byteListArray.add(bArray);
+	            
+	            if (socketList.size() > 1) {
+	            	
+	            	for (int j = 0; j < socketList.size(); j++) {
+	            		
+	            		if (j == i) {
+	            			continue;
+	            		}
+	            		
+	            		new SendFileManager(socketList, bArray).sendFile();
+	            	}
+	            }
         	}
+
             /*
         	Log.d(TAG, "receiver finished receiving");
         	this.mAct.runOnUiThread(new Runnable() {

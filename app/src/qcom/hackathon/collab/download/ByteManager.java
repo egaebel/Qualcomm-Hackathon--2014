@@ -191,13 +191,18 @@ public class ByteManager implements ConnectionInfoListener {
 			chunkOffset += bufferLen;
 		}
 		
+		public void writeChunkPosition(int chunkPos) {
+			
+			writer.write(chunkPos);
+		}
+		
 		public void writeBufferToFriends() {
 			
 			//wifiMan. TODO: write bytes to friendos
 			
 			int byteOffset = (chunkNum * chunkSize) + chunkOffset;
 			//use writer
-			//SendFileManager send = new SendFileManager(writer.toByteArray());
+			new SendFileManager(persistentSocketList, writer.toByteArray()).sendFile();
 		}
 		
 		public void writeChunkToFile() throws IOException {

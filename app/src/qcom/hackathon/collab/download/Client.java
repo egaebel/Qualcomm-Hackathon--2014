@@ -75,6 +75,9 @@ public class Client {
 		
 		InputStream in = new BufferedInputStream(conn.getInputStream());
 
+		//write chunk position to beginning!!!!!!!!!!!!!!
+		callback.writeChunkPosition(chunkNum);
+		
 		byte[] buffer = new byte[1024];
 		int bufferLen = 0;
 		while ((bufferLen = in.read(buffer)) > 0) {
