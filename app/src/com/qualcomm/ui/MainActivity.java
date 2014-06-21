@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import qcom.hackathon.collab.download.ByteManager;
 import qcom.hackathon.collab.download.R;
 import qcom.hackathon.collab.download.WiFiDConnectionManager;
 import qcom.hackathon.collab.download.WiFiP2pService;
@@ -39,17 +40,22 @@ import android.widget.Toast;
 @SuppressLint("NewApi")
 public class MainActivity extends Activity implements TabListener, ConnectionInfoListener {
 	public static RelativeLayout rl;
-	public static WiFiDConnectionManager wifi_ctrl = null; 
+	//public WiFiDConnectionManager wifi_ctrl = null; 
+	private ByteManager byteMan;
 	public static List<WiFiP2pService> peerList = null; 
 	static FragMent1 fram1;
 	static FragmentTransaction fragMentTra = null;
 	static FragMent2 fram2;
 	static FragMent3 fram3;
 	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.activity_action_bar_main);
+		
 		try {
 			rl = (RelativeLayout) findViewById(R.id.mainLayout);
 			fragMentTra = getFragmentManager().beginTransaction();
@@ -68,8 +74,15 @@ public class MainActivity extends Activity implements TabListener, ConnectionInf
 		} catch (Exception e) {
 			e.getMessage();
 		}
+		
 		//initialize wifi connection, searching for devices around
-		wifi_ctrl = new WiFiDConnectionManager(getApplicationContext(), this);
+		//wifi_ctrl = new WiFiDConnectionManager(getApplicationContext(), this);
+		try {
+			byteMan = new ByteManager("76.167.74.100", 80, this);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -131,9 +144,11 @@ public class MainActivity extends Activity implements TabListener, ConnectionInf
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 
 	}
-
 	
 	public void wel2peer(){
+		
+		peerList = byteMan.getServiceWifiCtrlServiceList();//wifi_ctrl.getServiceList();
+		
 		try {
 			rl.removeAllViews();
 		} catch (Exception e) {
@@ -164,25 +179,24 @@ public class MainActivity extends Activity implements TabListener, ConnectionInf
 		Toast.makeText(getApplicationContext(), "connection established", Toast.LENGTH_LONG).show();;
 	}
 
-	
-	
-	
-	
     @Override
     protected void onStop() {
-    	wifi_ctrl.stop();
+    	//wifi_ctrl.stop();
+    	byteMan.stopWifiD();
         super.onStop();
     }
 
     @Override
     public void onResume() {
-    	wifi_ctrl.resume(this);
+    	//wifi_ctrl.resume(this);
+    	byteMan.resumeWifiD(this);
         super.onResume();
     }
 
     @Override
     public void onPause() {
-    	wifi_ctrl.pause(this);
+    	//wifi_ctrl.pause(this);
+    	byteMan.pauseWifiD(this);
         super.onPause();
     }
 

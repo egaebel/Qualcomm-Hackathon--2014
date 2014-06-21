@@ -7,15 +7,20 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
+
+import android.app.Activity;
+import android.content.Context;
 
 public class ByteManager {
 
 	private WiFiDConnectionManager wifiDConnMan;
 	private Client client;
 	
-	public ByteManager(String ipAddress, int portNum) throws IOException {
+	public ByteManager(String ipAddress, int portNum, Activity activity) throws IOException {
 		
 		client = new Client(ipAddress, portNum);
+		wifiDConnMan = new WiFiDConnectionManager(activity.getApplicationContext(), activity); 
 	}
 	
 	public void kickstart() {
@@ -27,6 +32,26 @@ public class ByteManager {
 		//pass the data to demand, and load the callback
 		//ResponseCallback callback = ResponseCallback();
 		//client.demand(callback, groupId, groupSize, chunkSize, filename);
+	}
+	
+	public void stopWifiD() {
+		
+		wifiDConnMan.stop();
+	}
+	
+	public void resumeWifiD(Activity act) {
+		
+		wifiDConnMan.resume(act);
+	}
+	
+	public void pauseWifiD(Activity act) {
+		
+		wifiDConnMan.pause(act);
+	}
+	
+	public List<WiFiP2pService> getServiceWifiCtrlServiceList() {
+		
+		return wifiDConnMan.getServiceList();
 	}
 	
 	public class ResponseCallback {

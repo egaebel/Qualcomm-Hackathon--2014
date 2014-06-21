@@ -38,8 +38,6 @@ public class FragMent1 extends ListFragment{
 	public void onListItemClick(ListView l, View v, int pos, long id) {
 	  super.onListItemClick(l, v, pos, id);
 	  Toast.makeText(getActivity(), (String)l.getItemAtPosition(pos)+ " was clicked", Toast.LENGTH_SHORT).show();
-	  WiFiDConnectionManager manager= MainActivity.wifi_ctrl;
-      MainActivity.peerList = manager.getServiceList();
       Activity mAct = getActivity();
       ((MainActivity)mAct).wel2peer();
 	}	
