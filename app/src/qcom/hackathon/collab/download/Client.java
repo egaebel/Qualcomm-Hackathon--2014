@@ -50,35 +50,70 @@ public class Client {
 	 * 
 	 * @throws IOException
 	 */
-	public boolean demand(int groupId, int groupSize, int chunkSize, String filename) throws IOException {
+	public boolean demand(int groupId, int groupSize, long chunkSize, String filename) {
 
 		//Abstractions to get SocketChannel to work
-		InetSocketAddress inetSockAddr = new InetSocketAddress(InetAddress.getByName(ipAddress), portNum);	
-		sockChan.connect(inetSockAddr);
+		InetSocketAddress inetSockAddr = null;
+		
+		try {
+			inetSockAddr = new InetSocketAddress(InetAddress.getByName(ipAddress), portNum);
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			System.out.println("get by name failed...unknown host exception");
+		}	
+		
+		try {
+			sockChan.connect(inetSockAddr);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("IO EXCEPTION ON CONNECT!");
+		}
 
 		if (sockChan.isConnected()) {
-			Log.i(TAG, "Socket Channel Connected!!!!!");
+			
+			System.out.println("Socket Channel Connected!!!!!");
 			//Send Request-----------------------------
 			//Create & Pack ByteBuffer
-			int sendBufLength = 4 + 4 + 4 + 4 + filename.length();
+			int sendBufLength = 4 + 4 + 4 + 8 + (filename.length() * 2);
 			ByteBuffer sendBuf = ByteBuffer.allocate(sendBufLength);
 			sendBuf.putInt(sendBufLength);
 			sendBuf.putInt(groupId);
 			sendBuf.putInt(groupSize);
-			sendBuf.putInt(chunkSize);
-
+			sendBuf.putLong(chunkSize);
 			for (int j = 0; j < filename.length(); j++) {
 
 				sendBuf.putChar(filename.charAt(j));
 			}
-
+			
+			System.out.println("Byte buffer packed!");
+			
 			//Send
-			sockChan.write(sendBuf);
-
+			try {
+				sockChan.write(sendBuf);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("Sockchannel write IO exception!");
+			}
+			System.out.println("sockCHan write completed!");
 			//Await confirmation
 			ByteBuffer confirmBuf = ByteBuffer.allocate(1024);
-			while (sockChan.read(confirmBuf) > 0);
-
+			try {
+				while (sockChan.read(confirmBuf) > 0);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("sockChan read, IO EXCEPTION!");
+			}
+			
+			System.out.println("Sockchan read completed!");
+			
+			for (int k = 0; k < confirmBuf.limit(); k++) {
+				
+				System.out.print(confirmBuf.get(k));
+			}
 			//Validate confirmation
 			if (confirmBuf.equals(sendBuf)) {
 				
@@ -91,7 +126,8 @@ public class Client {
 		}
 		else {
 
-			Log.i(TAG, "Socket Channel CONNECTION FAILED!!!!!");
+			System.out.println("Socket Channel CONNECTION FAILED!!!!!");
+			
 			//error
 			return false;
 		}
@@ -101,7 +137,7 @@ public class Client {
 
 		if (sockChan.isConnected()) {
 
-
+			
 		}
 		else {
 
