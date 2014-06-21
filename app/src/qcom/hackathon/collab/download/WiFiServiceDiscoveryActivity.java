@@ -1,5 +1,4 @@
-
-package com.example.android.wifidirect.discovery;
+package qcom.hackathon.collab.download;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -25,10 +24,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.android.wifidirect.discovery.WiFiChatFragment.MessageTarget;
-import com.example.android.wifidirect.discovery.WiFiDirectServicesList.DeviceClickListener;
-import com.example.android.wifidirect.discovery.WiFiDirectServicesList.WiFiDevicesAdapter;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +41,6 @@ import java.util.Map;
  * the interface and messaging needs for a chat session.
  */
 public class WiFiServiceDiscoveryActivity extends Activity implements
-        DeviceClickListener, Handler.Callback, MessageTarget,
         ConnectionInfoListener {
 
 	private String TAG = "mainactivity";
@@ -105,8 +99,7 @@ public class WiFiServiceDiscoveryActivity extends Activity implements
         if (p2pInfo.isGroupOwner) {
             Log.d(TAG, "Connected as group owner");
             try {
-                handler = new GroupOwnerSocketHandler(
-                        ((MessageTarget) this).getHandler());
+                handler = new GroupOwnerSocketHandler(this);
                 handler.start();
             } catch (IOException e) {
                 Log.d(TAG,
@@ -115,9 +108,7 @@ public class WiFiServiceDiscoveryActivity extends Activity implements
             }
         } else {
             Log.d(TAG, "Connected as peer");
-            handler = new ClientSocketHandler(
-                    ((MessageTarget) this).getHandler(),
-                    p2pInfo.groupOwnerAddress);
+            handler = new ClientSocketHandler(this,p2pInfo.groupOwnerAddress);
             handler.start();
         }
     }

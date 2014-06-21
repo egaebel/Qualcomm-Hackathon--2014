@@ -1,4 +1,4 @@
-package com.example.android.wifidirect.discovery;
+package qcom.hackathon.collab.download;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,8 +26,6 @@ import android.net.wifi.p2p.WifiP2pManager.DnsSdTxtRecordListener;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 
-import com.example.android.wifidirect.discovery.WiFiDirectBroadcastReceiver;
-import com.example.android.wifidirect.discovery.WiFiDirectServicesList.WiFiDevicesAdapter;
 
 public class WiFiDConnectionManager {
 	
@@ -43,6 +41,7 @@ public class WiFiDConnectionManager {
     public static final String TXTRECORD_PROP_AVAILABLE = "available";
     public static final String SERVICE_INSTANCE = "_collaborativedownload";
     public static final String SERVICE_REG_TYPE = "_presence._tcp";
+    static final int SERVER_PORT = 4545;
 
     public static final int MESSAGE_READ = 0x400 + 1;
     public static final int MY_HANDLE = 0x400 + 2;
