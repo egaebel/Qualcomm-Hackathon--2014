@@ -3,105 +3,97 @@ package main
 import (
 	"os"
 	"log"
-	"net"
+	"strings"
+	"strconv"
 	"fmt"
+	"net/http"
+	"sync"
 )
 
 type Demand struct {
-	demand_size int32
 	groupID int32
 	group_size int32
-	chunk_size int32
+	chunk_size int64
 	filename string
 }
+
+type Group struct {
+	groupID int32
+	num_clients int32
+	current_file_location int64
+	file_size int64
+	current_client_num int32
+}
+
+var gr *Group
+var mut *sync.Mutex
 
 //Sets the maximum size of a buffer for a demand
 const BUFFER_LENGTH = 1024
 
-func main() {
-	// Listen on TCP port 80 on all interfaces.
-	l, err := net.Listen("tcp", ":8080")
+func HandleConnection(w http.ResponseWriter, req *http.Request) {
+
+	fmt.Println("Why hello there, let me handle this!")
+
+	fmt.Println("Wtf is this Request..." + req.URL.String())
+
+	//Split on dashes
+	args := strings.Split(req.URL.String(), "-")
+	if len(args) != 4 {
+		fmt.Println("Invalid number of args")
+	}
+
+	//Parse out args
+	groupId, err := strconv.ParseInt(args[0], 10, 32)
+	groupSize, err := strconv.ParseInt(args[1], 10, 32)
+	chunkSize, err := strconv.ParseInt(args[2], 10, 64)
+	filename := args[3]
+
+	//Construct demand struct
+	demand := new(Demand)
+	demand.groupID = int32(groupId)
+	demand.group_size = int32(groupSize)
+	demand.chunk_size = chunkSize
+
+	//Open filename
+	file, err := os.Open(filename)
+	defer file.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Couldn't open file in HandleConnection", err)
 	}
-	defer l.Close()
-	for {
-		// Wait for a connection.
-		conn, err := l.Accept()
-
-		fmt.Println("Opening a new connection")
-
-		if err != nil {
-			log.Fatal(err)
-		}
-		// Handle the connection in a new goroutine.
-		// The loop then returns to accepting, so that
-		// multiple connections may be served concurrently.
-		go handle_connection(conn)
+	mut.Lock()
+	if gr.num_clients == 0 {
+		gr.groupID = demand.groupID
+		gr.num_clients = demand.group_size
 	}
-}
-
-//Handles an incoming network connection
-//Currently echos data and writes to standard out
-//TO DO assign a chunk number and write back the chunk number,
-//      size of chunk, and the chunk
-func handle_connection(c net.Conn) {
-	//Ensures the connection
-	defer c.Close()
-
-	var buf [BUFFER_LENGTH]byte
-
-	n, err := c.Read(buf[0:])
-
-	if err != nil {
-        log.Fatal(err)
-    }
-
-    //Echo whatever was written so the client knows its information was recieved
-	_, err2 := c.Write(buf[0:n])
-
-	if err2 != nil {
-		log.Fatal(err2)
-	}
-
-	//Print out the information for debugging purposes
-	os.Stdout.Write(buf[0:n])
-
-	test_file, err_open := os.Open("/home/pi/files_for_hackathon/test")
-	if err_open != nil {
-		log.Fatal(err_open)
-		fmt.Println("Failed to open file.")
-	}
+	read_location := gr.current_file_location
+	gr.current_file_location = gr.current_file_location + demand.chunk_size
+	gr.current_client_num = gr.current_client_num + 1
+	mut.Unlock()
 	
-	n2, err_file_read := test_file.Read(buf[0:])
-	if err_file_read != nil {
-		log.Fatal(err_file_read)
-		fmt.Println("Failed to read file.")
+	//Keep track of how much has been read
+	n := 1
+	var total_read int64 = 0
+	themBytes := make([]byte, 1024)
+
+	//loop until we've read equal to the chunksize or the end of the file
+	for total_read < demand.chunk_size && n != 0 {
+		n = 0
+		n, _ = file.ReadAt(themBytes, read_location + total_read)
+		w.Write(themBytes)
 	}
-
-	_, err_file_write_to_client := test_file.Write(buf[0:n2])
-	if err_file_write_to_client != nil {
-		log.Fatal(err_file_write_to_client)
-		fmt.Println("Failed to write file to client.")
-	}
-
-	os.Stdout.Write(buf[0:n2])
-
 }
 
+//Initializes a group
 
-//Converts a C string stored in a []byte to a Go string
-func CToGoString(c []byte) string {
-    n := -1
-    for i, b := range c {
-        if b == 0 {
-            break
-        }
-        n = i
-    }
-    return string(c[:n+1])
-}
+func main() {
+	gr = new(Group)
+	mut = new(sync.Mutex)
 
-func parse_demand(d *Demand, buf []byte) {
+	http.HandleFunc("/", HandleConnection)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
 
+		log.Fatal("Listen and serve hates us....", err)
+	}
 }

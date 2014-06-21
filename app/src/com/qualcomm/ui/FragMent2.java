@@ -37,7 +37,7 @@ public class FragMent2 extends Fragment {
 	     
 	     //add text 
 	     TextView dataAmount= new TextView(getActivity());
-	     dataAmount.setText("DATA NEEDED: " + 100/arry.length + "MB");
+	     dataAmount.setText("DATA NEEDED: " + 100/(arry.length+1) + "MB");
 	     android.widget.LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
 	     lp.gravity = Gravity.CENTER;
 	     linearLayout.addView(dataAmount, lp);
