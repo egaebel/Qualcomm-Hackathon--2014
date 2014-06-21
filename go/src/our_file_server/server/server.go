@@ -32,7 +32,6 @@ var mut *sync.Mutex
 //Sets the maximum size of a buffer for a demand
 const BUFFER_LENGTH = 1024
 const FILE_SIZE = 1024
-const NUM_DOWNLOADERS = 2
 
 func HandleConnection(w http.ResponseWriter, req *http.Request) {
 
@@ -71,7 +70,6 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 		gr.groupID = demand.groupID
 		gr.num_clients = demand.group_size
 	}
-	demand.chunk_size = FILE_SIZE/NUM_DOWNLOADERS
 	read_location := int64(demand.chunk_number) * demand.chunk_size
 	gr.current_file_location = gr.current_file_location + demand.chunk_size
 	gr.current_client_num = gr.current_client_num + 1
@@ -80,11 +78,10 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 	//Keep track of how much has been read
 	n := 1
 	var total_read int64 = 0
-	themBytes := make([]byte, BUFFER_LENGTH)
+	themBytes := make([]byte, demand.chunk_size)
 
 	//loop until we've read equal to the chunksize or the end of the file
 	for total_read < demand.chunk_size && n != 0 {
-		n = 0
 		n, err = file.ReadAt(themBytes, read_location + total_read)
 		total_read = total_read + int64(n)
 		fmt.Println("The number of bytes read from the file is %d",total_read)
