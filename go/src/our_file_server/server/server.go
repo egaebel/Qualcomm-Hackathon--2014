@@ -21,6 +21,8 @@ const BUFFER_LENGTH = 1024
 
 func HandleConnection(w http.ResponseWriter, req *http.Request) {
 
+	fmt.Println("Why hello there, let me handle this!")
+
 	file, err := os.Open("dat_file")
 	if err != nil {
 		log.Fatal("Couldn't open file in HandleConnection", err)
@@ -33,6 +35,7 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ReadAt failed in HandleConnection...")
 	}
 	
+	fmt.Println("Writing them BYtes...awww yeahhh")
 	w.Write(themBytes)
 }
 
