@@ -21,17 +21,20 @@ public class ByteManager {
 	
 	public class ResponseCallback {
 		
-		//private
 		/**
 		 * The offset within the actual chunk.
 		 */
 		private int chunkOffset;
+		/**
+		 * ByteArray
+		 */
 		private ByteArrayOutputStream writer;
 		private int chunkNum;
 		private int chunkSize;
 		private File file;
 		
-		public ResponseCallback(String filename, int chunkNum, int chunkSize) throws IOException {
+		public ResponseCallback(WiFiDConnectionManager wifiMan, 
+								String filename, int chunkNum, int chunkSize) throws IOException {
 			
 			this.chunkNum = chunkNum;
 			this.chunkSize = chunkSize;
@@ -44,6 +47,11 @@ public class ByteManager {
 			
 			writer.write(buffer, (chunkNum * chunkSize) + chunkOffset, bufferLen);
 			chunkOffset += bufferLen;
+		}
+		
+		public void writeBufferToFriends(byte[] buffer, int bufferLen) {
+			
+			//wifiMan. TODO: write bytes to friendos
 		}
 		
 		public void writeChunkToFile() throws IOException {
