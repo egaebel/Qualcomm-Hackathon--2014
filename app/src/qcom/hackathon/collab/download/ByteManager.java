@@ -10,13 +10,23 @@ import java.io.IOException;
 
 public class ByteManager {
 
-	public ByteManager() {
+	private WiFiDConnectionManager wifiDConnMan;
+	private Client client;
+	
+	public ByteManager(String ipAddress, int portNum) throws IOException {
 		
-		
+		client = new Client(ipAddress, portNum);
 	}
 	
-	public void kickStart() {
+	public void kickstart() {
 		
+		//discovery
+		
+		//get the data determined from discovery
+		
+		//pass the data to demand, and load the callback
+		//ResponseCallback callback = ResponseCallback();
+		//client.demand(callback, groupId, groupSize, chunkSize, filename);
 	}
 	
 	public class ResponseCallback {
@@ -26,13 +36,38 @@ public class ByteManager {
 		 */
 		private int chunkOffset;
 		/**
-		 * ByteArray
+		 * Byte buffer that holds the bytes until the chunk can be written back to file.
 		 */
 		private ByteArrayOutputStream writer;
+		/**
+		 * The offset of the chunk in the file.
+		 * 
+		 * # of bytes of offset == (chunkNum * chunkSize)
+		 */
 		private int chunkNum;
+		/**
+		 * The size of the chunk to download.
+		 */
 		private int chunkSize;
+		/**
+		 * The File object to write to.
+		 */
 		private File file;
+		/**
+		 * The offset the chunk starts at from the beginning of the file in number of bytes
+		 */
+		private int byteOffset;
 		
+		
+		/**
+		 *  
+		 * 
+		 * @param wifiMan
+		 * @param filename
+		 * @param chunkNum
+		 * @param chunkSize
+		 * @throws IOException
+		 */
 		public ResponseCallback(WiFiDConnectionManager wifiMan, 
 								String filename, int chunkNum, int chunkSize) throws IOException {
 			
@@ -41,8 +76,9 @@ public class ByteManager {
 			chunkOffset = 0;
 			file = new File(filename);
 			writer = new ByteArrayOutputStream(1024);
+			byteOffset = -1;
 		}
-		
+
 		public void writeToByteBuffer(byte[] buffer, int bufferLen) {
 			
 			writer.write(buffer, (chunkNum * chunkSize) + chunkOffset, bufferLen);
@@ -52,14 +88,30 @@ public class ByteManager {
 		public void writeBufferToFriends(byte[] buffer, int bufferLen) {
 			
 			//wifiMan. TODO: write bytes to friendos
+			int byteOffset = (chunkNum * chunkSize) + chunkOffset;
 		}
 		
 		public void writeChunkToFile() throws IOException {
 			
 			FileOutputStream out = new FileOutputStream(file);
 			writer.writeTo(out);
+			out.write(writer.toByteArray(), (chunkNum * chunkSize), writer.toByteArray().length);
 			writer.close();
 			out.close();
+		}
+
+		/**
+		 * @return the byteOffset
+		 */
+		public int getByteOffset() {
+			return byteOffset;
+		}
+
+		/**
+		 * @param byteOffset the byteOffset to set
+		 */
+		public void setByteOffset(int byteOffset) {
+			this.byteOffset = byteOffset;
 		}
 	}
 }

@@ -68,14 +68,13 @@ public class Client {
 		InputStream in = new BufferedInputStream(conn.getInputStream());
 
 		byte[] buffer = new byte[1024];
-		while (in.read(buffer) > 0) {
+		int bufferLen = 0;
+		while ((bufferLen = in.read(buffer)) > 0) {
 			
-			System.out.println(buffer);
+			callback.writeToByteBuffer(buffer, bufferLen);
+			callback.writeBufferToFriends(buffer, bufferLen);
 		}
 		
-		while (in.read(buffer) > 0) {
-			
-			System.out.println(buffer);
-		}
+		callback.writeChunkToFile();
 	}
 }
