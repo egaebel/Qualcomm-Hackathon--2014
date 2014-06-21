@@ -16,6 +16,17 @@ type Demand struct {
 	filename string
 }
 
+type Group struct {
+	groupID int32
+	num_clients int32
+	current_file_location int64
+	file_size int64
+	current_client_num int32
+}
+
+var gr *Group
+var mut *Mutex
+
 //Sets the maximum size of a buffer for a demand
 const BUFFER_LENGTH = 1024
 
@@ -45,19 +56,38 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 
 	//Open filename
 	file, err := os.Open(filename)
+	defer file.Close()
 	if err != nil {
 		log.Fatal("Couldn't open file in HandleConnection", err)
 	}
-
-
+	mut.Lock()
+	if gr.num_clients == 0 {
+		gr.groupID = demand.groupID
+		gr.num_clients = demand.group_size
+	}
+	read_location := gr.current_file_location
+	gr.current_file_location = gr.current_file_location + demand.chunk_size
+	gr.current_client_num = gr.current_client_num + 1
+	mut.Unlock()
+	
+	//Keep track of how much has been read
+	n := 1
+	total_read := 0
 	themBytes := make([]byte, 1024)
-	file.ReadAt(themBytes, 0)
 
-	fmt.Println("Writing them BYtes...awww yeahhh")
-	w.Write(themBytes)
+	//loop until we've read equal to the chunksize or the end of the file
+	for total_read < demand.chunk_size && n != 0 {
+		n, _ = file.ReadAt(themBytes, read_location + total_read)
+		fmt.Println("Writing them BYtes...awww yeahhh")
+		w.Write(themBytes)
+	}
 }
 
+//Initializes a group
+
 func main() {
+	gr = new(Group)
+	mut = new(Mutex)
 
 	http.HandleFunc("/", HandleConnection)
 	err := http.ListenAndServe(":8080", nil)
