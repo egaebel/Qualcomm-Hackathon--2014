@@ -18,7 +18,32 @@ type Demand struct {
 //Sets the maximum size of a buffer for a demand
 const BUFFER_LENGTH = 1024
 
+func HandleConnection(w http.ResponseWriter, req *http.Request) {
+
+	file, err := os.Open("dat_file")
+	if err != nil {
+		log.Fatal("Couldn't open file in HandleConnection", err)
+	}
+
+	themBytes := make([]byte, 1024)
+	_, err := file.ReadAt(themBytes, 0)
+	if err != nil {
+		log.Fatal("ReadAt failed in HandleConnection...")
+	}
+	
+	w.Write(themBytes)
+}
+
 func main() {
+
+	http.HandleFunc("/", HandleConnection)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+
+		log.Fatal("Listen and serve hates us....", err)
+	}
+
+	/*
 	// Listen on TCP port 80 on all interfaces.
 	l, err := net.Listen("tcp", ":8080")
 	if err != nil {
@@ -39,6 +64,7 @@ func main() {
 		// multiple connections may be served concurrently.
 		go handle_connection(conn)
 	}
+	*/
 }
 
 //Handles an incoming network connection
