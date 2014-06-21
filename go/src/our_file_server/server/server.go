@@ -51,7 +51,7 @@ func handle_connection(c net.Conn) {
 
 	_, err2 := c.Write(buf[0:n])
 
-	os.Stdout.Write(buf[:])
+	os.Stdout.Write(buf[0:n])
 }
 
 func CToGoString(c []byte) string {
