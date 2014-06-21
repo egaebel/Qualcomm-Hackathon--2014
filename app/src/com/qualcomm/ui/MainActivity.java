@@ -106,7 +106,10 @@ public class MainActivity extends Activity implements TabListener, ConnectionInf
 			}
 			fram2 = new FragMent2();
 			Bundle args = new Bundle();
-			String[] peerListName = new String[]{"peer1", "peer2", "peer3", "peer4"};
+			String[] peerListName = new String[peerList.size()];
+			for (int i=0; i < peerList.size(); i++){
+				peerListName[i] = peerList.get(i).device.deviceName;
+			}
 			args.putStringArray("list", peerListName);
 			fram2.setArguments(args);
 			fragMentTra.addToBackStack(null);
@@ -134,6 +137,12 @@ public class MainActivity extends Activity implements TabListener, ConnectionInf
 
 	
 	public void wel2peer(){
+		this.getActionBar().setSelectedNavigationItem(1);
+		for (WiFiP2pService eachDevice:peerList){
+			wifi_ctrl.connectP2p(eachDevice);
+			Log.d("connecting to device", eachDevice.device.deviceName);
+		}
+/*		
 		try {
 			rl.removeAllViews();
 		} catch (Exception e) {
@@ -147,11 +156,10 @@ public class MainActivity extends Activity implements TabListener, ConnectionInf
 		args.putStringArray("list", peerListName);
 		fram2.setArguments(args);
 		fragMentTra.addToBackStack(null);
-		this.getActionBar().setSelectedNavigationItem(1);						
 		fragMentTra = getFragmentManager().beginTransaction();
 		fragMentTra.add(rl.getId(), fram2);
 		fragMentTra.commit();
-
+*/
 	}
 	
 	
