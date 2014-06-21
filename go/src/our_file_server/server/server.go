@@ -7,9 +7,17 @@ import (
 	"net"
 )
 
+type Demand struct {
+	demand_size int
+	groupID int
+	group_size int
+	chunk_size int
+	filename string
+}
+
 func main() {
 	// Listen on TCP port 2000 on all interfaces.
-	l, err := net.Listen("tcp", ":8080")
+	l, err := net.Listen("tcp", ":80")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,5 +51,16 @@ func handle_connection(c net.Conn) {
 
 	_, err2 := c.Write(buf[0:n])
 
-	os.Stdout.Write(buf)
+	os.Stdout.Write(buf[0:n])
+}
+
+func CToGoString(c []byte) string {
+    n := -1
+    for i, b := range c {
+        if b == 0 {
+            break
+        }
+        n = i
+    }
+    return string(c[:n+1])
 }
