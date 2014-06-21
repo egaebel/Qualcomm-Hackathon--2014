@@ -36,6 +36,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private WifiP2pManager manager;
     private Channel channel;
     private Activity activity;
+    private ConnectionInfoListener listener;
 
     /**
      * @param manager WifiP2pManager system service
@@ -43,11 +44,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
      * @param activity activity associated with the receiver
      */
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel,
-            Activity activity) {
+            Activity activity, ConnectionInfoListener listener) {
         super();
         this.manager = manager;
         this.channel = channel;
         this.activity = activity;
+        this.listener = listener;
     }
 
     /*
@@ -75,7 +77,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 //Log.d(WiFiServiceDiscoveryActivity.TAG,
                 //        "Connected to p2p network. Requesting network details");
                 manager.requestConnectionInfo(channel,
-                        (ConnectionInfoListener) activity);
+                        (ConnectionInfoListener) this.listener);
             } else {
                 // It's a disconnect
             }

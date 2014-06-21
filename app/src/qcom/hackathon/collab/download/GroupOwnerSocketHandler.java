@@ -1,4 +1,3 @@
-
 package qcom.hackathon.collab.download;
 
 import android.app.Activity;
