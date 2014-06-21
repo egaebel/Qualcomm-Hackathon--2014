@@ -8,10 +8,10 @@ import (
 )
 
 type Demand struct {
-	demand_size int
-	groupID int
-	group_size int
-	chunk_size int
+	demand_size int32
+	groupID int32
+	group_size int32
+	chunk_size int32
 	filename string
 }
 
@@ -25,6 +25,9 @@ func main() {
 	for {
 		// Wait for a connection.
 		conn, err := l.Accept()
+
+		fmt.Println("Opening a new connection")
+
 		if err != nil {
 			log.Fatal(err)
 		}
