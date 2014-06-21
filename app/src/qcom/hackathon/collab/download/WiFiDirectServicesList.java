@@ -1,5 +1,5 @@
 
-package com.example.android.wifidirect.discovery;
+package qcom.hackathon.collab.download;
 
 import android.app.ListFragment;
 import android.content.Context;
@@ -11,9 +11,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
+import qcom.hackathon.collab.download.R;
 
 /**
  * A simple ListFragment that shows the available services as published by the

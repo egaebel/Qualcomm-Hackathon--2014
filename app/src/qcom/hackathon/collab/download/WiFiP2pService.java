@@ -1,5 +1,5 @@
 
-package com.example.android.wifidirect.discovery;
+package qcom.hackathon.collab.download;
 
 import android.net.wifi.p2p.WifiP2pDevice;
 
