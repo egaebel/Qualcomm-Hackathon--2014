@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"log"
-	"net"
+	//"net"
 	"fmt"
 	"net/http"
 )
@@ -29,12 +29,8 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 	}
 
 	themBytes := make([]byte, 1024)
-	_, err = file.ReadAt(themBytes, 0)
+	file.ReadAt(themBytes, 0)
 
-	if err != nil {
-		log.Fatal("ReadAt failed in HandleConnection...")
-	}
-	
 	fmt.Println("Writing them BYtes...awww yeahhh")
 	w.Write(themBytes)
 }
@@ -140,7 +136,4 @@ func CToGoString(c []byte) string {
 func parse_demand(d *Demand, buf []byte) {
 
 }
-<<<<<<< HEAD
 */
-=======
->>>>>>> 595d162fb19662c2f7007fa8ee376659f35b0509
