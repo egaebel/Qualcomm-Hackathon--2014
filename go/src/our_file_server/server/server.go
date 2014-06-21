@@ -14,6 +14,7 @@ type Demand struct {
 	groupID int32
 	group_size int32
 	chunk_size int64
+	chunk_number int32
 	filename string
 }
 
@@ -30,6 +31,8 @@ var mut *sync.Mutex
 
 //Sets the maximum size of a buffer for a demand
 const BUFFER_LENGTH = 1024
+const FILE_SIZE = 1024
+const NUM_DOWNLOADERS = 2
 
 func HandleConnection(w http.ResponseWriter, req *http.Request) {
 
@@ -39,7 +42,7 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 
 	//Split on dashes
 	args := strings.Split(req.URL.String(), "-")
-	if len(args) != 4 {
+	if len(args) != 5 {
 		fmt.Println("Invalid number of args")
 	}
 
@@ -47,12 +50,14 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 	groupId, err := strconv.ParseInt(args[0], 10, 32)
 	groupSize, err := strconv.ParseInt(args[1], 10, 32)
 	chunkSize, err := strconv.ParseInt(args[2], 10, 64)
-	filename := args[3]
+	chunkNumber, err := strconv.ParseInt(args[3], 10, 32)
+	filename := args[4]
 
 	//Construct demand struct
 	demand := new(Demand)
 	demand.groupID = int32(groupId)
 	demand.group_size = int32(groupSize)
+	demand.chunk_number = int32(chunkNumber)
 	demand.chunk_size = chunkSize
 
 	//Open filename
@@ -66,7 +71,8 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 		gr.groupID = demand.groupID
 		gr.num_clients = demand.group_size
 	}
-	read_location := gr.current_file_location
+	demand.chunk_size = FILE_SIZE/NUM_DOWNLOADERS
+	read_location := int64(demand.chunk_number) * demand.chunk_size
 	gr.current_file_location = gr.current_file_location + demand.chunk_size
 	gr.current_client_num = gr.current_client_num + 1
 	mut.Unlock()
@@ -74,7 +80,7 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 	//Keep track of how much has been read
 	n := 1
 	var total_read int64 = 0
-	themBytes := make([]byte, 1024)
+	themBytes := make([]byte, BUFFER_LENGTH)
 
 	//loop until we've read equal to the chunksize or the end of the file
 	for total_read < demand.chunk_size && n != 0 {
